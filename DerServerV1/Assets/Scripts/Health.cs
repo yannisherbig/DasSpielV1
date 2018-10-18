@@ -16,7 +16,6 @@ public class Health : MonoBehaviour
         if (currentHealth <= 0)
         {
             currentHealth = 0;
-            //Player died
             gameObject.SetActive(false);
             Destroy(Instantiate(deathEffect.gameObject, gameObject.transform.position, Quaternion.identity) as GameObject , deathEffect.main.startLifetime.constant);
         }

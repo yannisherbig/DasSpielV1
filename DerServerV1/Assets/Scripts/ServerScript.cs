@@ -15,14 +15,10 @@ public class Player
     {
         this.PlayerObject = playerObject;
         this.Username = username;
-        this.Score = 0;
-        this.Health = 100;
     }
 
     public GameObject PlayerObject { get; set; }
     public string Username { get; set; }
-    public int Health { get; set; }
-    public int Score { get; set; }
 }
 
 public class ServerScript : MonoBehaviour {
@@ -139,22 +135,20 @@ public class ServerScript : MonoBehaviour {
                 try
                 {
                     ns = connectedClient.GetStream();
-                    //if(ns.DataAvailable)    
                     if (ns.CanRead)
                     {
                         byte[] receivedBuffer = new byte[1024];
                         int numberOfBytesRead = 0;
 
-                        //int offset = 0;
+       
                         int remaining = receivedBuffer.Length;
-                        //while (remaining > 0)
-                        //{
+                      
                         Debug.Log("Before data read");
                         numberOfBytesRead = ns.Read(receivedBuffer, 0, receivedBuffer.Length);
                         Debug.Log("After data read");
                         Debug.Log("numberOfBytes read: " + numberOfBytesRead);
                         remaining -= numberOfBytesRead;
-                        //offset += numberOfBytesRead;
+                
                         if (numberOfBytesRead <= 0)
                         {
                             throw new EndOfStreamException
@@ -164,8 +158,7 @@ public class ServerScript : MonoBehaviour {
 
                         StringBuilder msg = new StringBuilder();
                         int byteCounter = 0;
-                        //string[] messages = new string[100];
-                        //int messagesCounter = 0;
+           
                         for (int i = 0; i < numberOfBytesRead; i++)
                         {
                             char zeichen = Convert.ToChar(receivedBuffer[i]);
@@ -230,117 +223,6 @@ public class ServerScript : MonoBehaviour {
 	    }
     }
 
-    private void WorkWithClient(object client)
-    {
-        TcpClient connectedClient = client as TcpClient;
-        if (connectedClient == null)
-        {
-            Debug.Log("TCP client is null, stopping processing for this client");
-            connectedClient.Close();
-            return;
-        }
-
-        string ip = ((IPEndPoint)connectedClient.Client.RemoteEndPoint).Address.ToString();
-        int clientPort = ((IPEndPoint)connectedClient.Client.RemoteEndPoint).Port;
-
-        NetworkStream ns = null;
-
-        Debug.Log("Thread.CurrentThread.ManagedThreadId (in WorkWithClient()): " + Thread.CurrentThread.ManagedThreadId);
-
-        try
-        {
-            while (isRunning)
-            {
-
-                ns = connectedClient.GetStream();
-                //if(ns.DataAvailable)    
-                if (ns.CanRead)
-                {
-                    byte[] receivedBuffer = new byte[1024];
-                    int numberOfBytesRead = 0;
-
-                    //int offset = 0;
-                    int remaining = receivedBuffer.Length;
-                    //while (remaining > 0)
-                    //{
-                    Debug.Log("Before data read");
-                    numberOfBytesRead = ns.Read(receivedBuffer, 0, receivedBuffer.Length);
-                    Debug.Log("After data read");
-                    Debug.Log("numberOfBytes read: " + numberOfBytesRead);
-                    remaining -= numberOfBytesRead;
-                    //offset += numberOfBytesRead;
-                    if (numberOfBytesRead <= 0)
-                    {
-                        throw new EndOfStreamException
-                            (String.Format("End of stream reached with {0} bytes left to read", remaining));
-                    }
-
-
-                    StringBuilder msg = new StringBuilder();
-                    int byteCounter = 0;
-                    //string[] messages = new string[100];
-                    //int messagesCounter = 0;
-                    for (int i = 0; i < numberOfBytesRead; i++)
-                    {
-                        char zeichen = Convert.ToChar(receivedBuffer[i]);
-                        byteCounter++;
-                        Debug.Log("byte " + byteCounter + ": " + zeichen);
-                        if (receivedBuffer[i].Equals(59))  // Bei einem Semikolon (59) ist die Nachricht zuende 
-                        {
-                            Debug.Log("; erreicht");
-                            string message = msg.ToString();
-                            HandleData(connectedClient, message, ip, clientPort);
-                            if (message.Contains("DISCONNECT;"))
-                            {
-                                ns.Close();
-                                connectedClient.Close();
-                                return;
-                            }
-                            msg = new StringBuilder();
-                            //break;
-                            //messages[messagesCounter] = msg.ToString();
-                            //messagesCounter++;
-                            //msg = new StringBuilder();
-                        }
-                        else
-                        {
-                            msg.Append(zeichen.ToString());
-                        }
-                    }
-
-                }
-            }
-
-        }
-        catch (EndOfStreamException e)
-        {
-            ns.Close();
-            if (connectedClient.Connected)
-                connectedClient.Close();
-          
-            Debug.Log(e);
-            return;
-        }
-        catch (SocketException socketException)
-        {
-            ns.Close();
-            if (connectedClient.Connected)
-                connectedClient.Close();
-           
-            Debug.Log("Socket exception: " + socketException);
-            return;
-        }
-        catch (ThreadAbortException tae)
-        {
-            ns.Close();
-            if (connectedClient.Connected)
-                connectedClient.Close();
-    
-            Debug.Log(tae);
-            return;
-        }
-
-    }
 
     void HandleData(TcpClient connectedClient, string msgStr, string ip, int clientPort)
     {      
@@ -350,13 +232,11 @@ public class ServerScript : MonoBehaviour {
 
         string[] splitData = msgStr.Split('|');
 
-        //        foreach(string str in splitData)
-        //        { 
             switch (splitData[0])
             {
                 case "CONNECT":
                     string username = splitData[1];
-                    //int clientServerSocketPort = Int32.Parse(splitData[2]);
+            
                     UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(ip, username, clientPort));
                     break;
 
@@ -371,7 +251,7 @@ public class ServerScript : MonoBehaviour {
                         UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_Move(ip, speed));
                     else
                         Console.WriteLine("Invalid argument for speed. Conversion from string to int did not succeed");
-                    //int speed = Int32.Parse(splitData[1]);                     
+                                  
                     break;
 
                 case "ROTATE":
@@ -409,7 +289,7 @@ public class ServerScript : MonoBehaviour {
                     UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_DisconnectPlayer(ip));
                     break;
             }
-     //   }
+   
     }
 
 
@@ -486,7 +366,7 @@ public class ServerScript : MonoBehaviour {
     {
         if (players.ContainsKey(ip))
         {
-            string serverMessage = "Your current speed is: " + players[ip].PlayerObject.GetComponent<Rigidbody>().velocity.magnitude + "\n, Your current score is: " + players[ip].Score + "\n";
+            string serverMessage = "Your current speed is: " + players[ip].PlayerObject.GetComponent<Rigidbody>().velocity.magnitude + "\n, Your current score is: " + players[ip].PlayerObject.GetComponent<PlayerScript>().score + "\n, Your current health is at: " + players[ip].PlayerObject.GetComponent<Health>().currentHealth + "%\n";
             Debug.Log("serverMessage in getStatus: " + serverMessage);
             SendMessage(connectedClient, serverMessage);
         }
@@ -620,16 +500,6 @@ public class ServerScript : MonoBehaviour {
         yield return null;
     }
 
-/*
-    bool Compare(double a, double b, double precision)
-    {
-        if (Math.Abs(a - b) < precision)
-            return true;
-        else
-            return false;
-    }
-*/
-
     private void SendMessage(TcpClient client, string serverMessage)
     {
         try
@@ -637,7 +507,7 @@ public class ServerScript : MonoBehaviour {
             serverMessage = serverMessage + ";\n";
             Debug.Log("ServerMessage: " + serverMessage);
             Debug.Log("in SendMessage");
-            //TcpClient client = new TcpClient(ip, clientServerSocketPort);
+   
             NetworkStream stream = client.GetStream();
             if (stream.CanWrite)
             {
