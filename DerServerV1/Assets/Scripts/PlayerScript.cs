@@ -26,7 +26,7 @@ public class PlayerScript : MonoBehaviour {
     
         RaycastHit hit;
         Ray landingRay = new Ray(transform.position, Vector3.Normalize(slightForwardPoint.transform.position - transform.position));
-     
+        Debug.DrawRay(transform.position, Vector3.Normalize(slightForwardPoint.transform.position - transform.position) * raycastDistance);
         if(Physics.Raycast(landingRay, out hit, raycastDistance))
         {          
             if (hit.collider.gameObject.tag.Equals("Wall"))
@@ -39,7 +39,7 @@ public class PlayerScript : MonoBehaviour {
 
     private void OnTriggerEnter(Collider other)
     {
-     
+
         if (other.gameObject.CompareTag("PickUp"))
         {          
             other.gameObject.SetActive(false);

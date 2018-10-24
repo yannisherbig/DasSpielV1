@@ -19,10 +19,14 @@ public class Player
 
     public GameObject PlayerObject { get; set; }
     public string Username { get; set; }
+    //public int materialNum { get; set; }
+    //public int materialCounter { get; set; }
+    public int playModelNum { get; set; }
 }
 
 public class ServerScript : MonoBehaviour {
 
+ 
     // TcpListener zum abhören der Verbindungen
     TcpListener tcpListener;
 
@@ -33,7 +37,8 @@ public class ServerScript : MonoBehaviour {
     private bool isRunning;
 
     // Referenz auf das Player-Prefab
-    public GameObject playerObject;
+    //public GameObject playerObject;
+    public GameObject[] playerObjectModels;
 
     // Referenz auf das PickUp-Prefab
     public GameObject pickUp;
@@ -58,9 +63,9 @@ public class ServerScript : MonoBehaviour {
     public Toggle pickUpToggle;
 
     // public float speed = 5;
-
+    int playerModelNumber;
+    
     IEnumerator Start() {
-        Debug.Log("in Start");
         startButtonClicked = false;
         modalPanelObject.SetActive(true);
         while (!startButtonClicked)
@@ -320,13 +325,36 @@ public class ServerScript : MonoBehaviour {
             Debug.Log(username + " connected from " + ip + ":" + clientPort);
 
             int spawnPointX = UnityEngine.Random.Range(-20, 20);
-            int spawnPointZ = UnityEngine.Random.Range(-20, 20);
+            int spawnPointZ = UnityEngine.Random.Range(-7, 7);
             Vector3 spawnPosition = new Vector3(spawnPointX, 0, spawnPointZ);
 
-            GameObject temp = Instantiate(playerObject, spawnPosition, Quaternion.identity);
+            if (players.Count > 0)
+            {
+                while (true)
+                {
+                    foreach (var player in players)
+                    {
+                        if (player.Value.playModelNum == playerModelNumber)
+                        {
+                            playerModelNumber++;
+                            break;
+                        }
+                        else
+                        {
+                            goto endOfLoop;
+                        }
+
+                    }
+
+                }
+            }
+            endOfLoop:
+            GameObject temp = Instantiate(playerObjectModels[playerModelNumber], spawnPosition, Quaternion.identity);
 
             Player newPlayer = new Player(temp, username);
             players.Add(ip, newPlayer);
+            players[ip].playModelNum = playerModelNumber;
+            playerModelNumber++;
             Debug.Log("Client with ip address " + ip + " added to dictionary; players.count = " + players.Count);
         }
         yield return null;
@@ -336,19 +364,16 @@ public class ServerScript : MonoBehaviour {
 
     public IEnumerator ExecuteOnMainThread_SpawnPlayer(string ip)
     {
-        if (players.ContainsKey(ip))
-        {
-            if (!players[ip].PlayerObject.activeInHierarchy)
-            {
-                players[ip].PlayerObject.SetActive(true);
-                string username = players[ip].Username;
-                Debug.Log(username + " spawned on the field");
-            }
+        if (players.ContainsKey(ip) && !players[ip].PlayerObject.activeInHierarchy)
+        {           
+            players[ip].PlayerObject.SetActive(true);
+            string username = players[ip].Username;
+            Debug.Log(username + " spawned on the field; Player-Model: " + playerObjectModels[players[ip].playModelNum].name.Substring(6));
+                       
         }
         else
         {
             Debug.Log("Player from " + ip + " trying to spawn, but has not connected yet");
-            
         }
         yield return null;
     }
@@ -434,6 +459,7 @@ public class ServerScript : MonoBehaviour {
             Vector3 forwardVel = players[ip].PlayerObject.GetComponent<Transform>().forward * speed;
             Vector3 horizontalVel = players[ip].PlayerObject.GetComponent<Transform>().right * speed;
 
+         
             players[ip].PlayerObject.GetComponent<Rigidbody>().velocity = forwardVel + horizontalVel;
 
             /*      float moveHorizontal = 0f;

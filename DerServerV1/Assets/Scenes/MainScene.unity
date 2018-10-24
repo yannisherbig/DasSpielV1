@@ -1520,12 +1520,6 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 114387301542433856, guid: 984ce53dd54b95545aad623b9fd05679,
         type: 2}
-      propertyPath: playerObject
-      value: 
-      objectReference: {fileID: 1870642695388648, guid: cc4869faf5bd62d43a0d7a84a546956e,
-        type: 2}
-    - target: {fileID: 114387301542433856, guid: 984ce53dd54b95545aad623b9fd05679,
-        type: 2}
       propertyPath: lEndpointText
       value: 
       objectReference: {fileID: 1856748060}
@@ -1534,12 +1528,6 @@ Prefab:
       propertyPath: modalPanelObject
       value: 
       objectReference: {fileID: 524873570}
-    - target: {fileID: 114387301542433856, guid: 984ce53dd54b95545aad623b9fd05679,
-        type: 2}
-      propertyPath: pickUp
-      value: 
-      objectReference: {fileID: 1822920649587812, guid: 3201003be50b843438d0925e310b5721,
-        type: 2}
     - target: {fileID: 114387301542433856, guid: 984ce53dd54b95545aad623b9fd05679,
         type: 2}
       propertyPath: pickUpToggle
