@@ -30,8 +30,7 @@ public class PlayerScript : MonoBehaviour {
         if(Physics.Raycast(landingRay, out hit, raycastDistance))
         {          
             if (hit.collider.gameObject.tag.Equals("Wall"))
-            {
-    
+            {  
                 distToWallAhead = hit.distance;
             }
         }

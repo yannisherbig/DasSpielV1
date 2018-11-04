@@ -438,7 +438,7 @@ public class ServerScript : MonoBehaviour {
                     m.color = new Color(255, 255, 255, 255);
                     break;
             }
-            players[ip].PlayerObject.GetComponent<TrailRenderer>().time = 500;
+            players[ip].PlayerObject.GetComponent<TrailRenderer>().time = 30;
         }
         yield return null;
     }

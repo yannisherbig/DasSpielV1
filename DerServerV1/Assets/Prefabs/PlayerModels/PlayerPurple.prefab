@@ -109,7 +109,7 @@ GameObject:
   - component: {fileID: 114105256860345202}
   m_Layer: 0
   m_Name: PlayerPurple
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -725,7 +725,7 @@ TrailRenderer:
   m_Time: 0
   m_Parameters:
     serializedVersion: 2
-    widthMultiplier: 0.5
+    widthMultiplier: 0.2
     widthCurve:
       serializedVersion: 2
       m_Curve:
