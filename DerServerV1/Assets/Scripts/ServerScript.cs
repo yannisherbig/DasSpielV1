@@ -391,7 +391,7 @@ public class ServerScript : MonoBehaviour {
     {
         if (players.ContainsKey(ip))
         {
-            string serverMessage = "Your current speed is: " + players[ip].PlayerObject.GetComponent<Rigidbody>().velocity.magnitude + "\n, Your current score is: " + players[ip].PlayerObject.GetComponent<PlayerScript>().score + "\n, Your current health is at: " + players[ip].PlayerObject.GetComponent<Health>().currentHealth + "%\n";
+            string serverMessage = "Your current status is: " + players[ip].PlayerObject.GetComponent<Rigidbody>().velocity.magnitude + " velocity, " + players[ip].PlayerObject.GetComponent<PlayerScript>().score + " PickUps collected, " + players[ip].PlayerObject.GetComponent<Health>().currentHealth + "% health";
             Debug.Log("serverMessage in getStatus: " + serverMessage);
             SendMessage(connectedClient, serverMessage);
         }
