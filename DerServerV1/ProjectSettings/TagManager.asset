@@ -9,6 +9,8 @@ TagManager:
   - PlayingField
   - Plane
   - Test
+  - PickUpGolden
+  - PickUpPoisonous
   layers:
   - Default
   - TransparentFX
@@ -19,9 +21,9 @@ TagManager:
   - 
   - 
   - Background
-  - 
-  - 
-  - 
+  - Player
+  - PickUp
+  - PlayerHelper
   - 
   - 
   - 

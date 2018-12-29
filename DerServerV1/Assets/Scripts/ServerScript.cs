@@ -19,14 +19,12 @@ public class Player
 
     public GameObject PlayerObject { get; set; }
     public string Username { get; set; }
-    //public int materialNum { get; set; }
-    //public int materialCounter { get; set; }
-    public int playModelNum { get; set; }
+    public int PlayModelNum { get; set; }
 }
+ 
 
 public class ServerScript : MonoBehaviour {
 
- 
     // TcpListener zum abhören der Verbindungen
     TcpListener tcpListener;
 
@@ -39,19 +37,20 @@ public class ServerScript : MonoBehaviour {
     // Referenz auf das Player-Prefab
     //public GameObject playerObject;
     public GameObject[] playerObjectModels;
-
-    // Referenz auf das PickUp-Prefab
-    public GameObject pickUp;
+ 
+    // Referenz auf die PickUp-Prefabs
+    public GameObject pickUp, pickUpCopy, pickUpGolden, pickUpPoisonous;
 
     // Dictionary zur Verwaltung der verbundenen Spieler
     public Dictionary<string, Player> players = new Dictionary<string, Player>();
 
     // Liste der Pick-Up-Objects
-    private List<GameObject> pickUps = new List<GameObject>();
+    //private List<GameObject> pickUps = new List<GameObject>();
 
     // Referenz auf das Anzeigefeld, welches die Verbindungsinformationen vom Server darstellt, 
     // womit sich die Studenten mit ihrem Rechner zum Server verbinden können
-    public Text lEndpointText;
+    public Text lEndpointText, top3Text, highscoreText;
+    public int highScore;
 
     // Signalisiert den Spielbeginn
     public bool startButtonClicked;
@@ -64,7 +63,13 @@ public class ServerScript : MonoBehaviour {
 
     // public float speed = 5;
     int playerModelNumber;
-    
+
+    // Referenz auf die Spieler mit den meisten Punkten
+    Player p1stScore, p2ndScore, p3rdScore;
+
+    // Layer-Maske für Physics.OverlapSphere()
+    int layerMask;
+
     IEnumerator Start() {
         startButtonClicked = false;
         modalPanelObject.SetActive(true);
@@ -72,36 +77,71 @@ public class ServerScript : MonoBehaviour {
         {
             yield return null;
         }
-
-        Debug.Log("Button clicked, Toggle: " + pickUpToggle.isOn);
+        // Es wird nur die Player-Layer benötigt
+        layerMask = 1 << 11;
+  
         modalPanelObject.SetActive(false);
 
-   
+        isRunning = true;
         if (pickUpToggle.isOn)
         {
-            SpawnPickUps();
+            InvokeRepeating("SpawnStandardPickUp", 0, 5);
+            InvokeRepeating("SpawnPoisonousPickUp", 6, 12);
+            InvokeRepeating("SpawnGoldenPickUp", 29, 29);
         }
-
-        isRunning = true;
         ThreadStart ts = new ThreadStart(StartListening);
         tcpListenerThread = new Thread(ts);
         tcpListenerThread.Start();
-     
-        Debug.Log("Thread.CurrentThread.ManagedThreadId (in Start()): " + Thread.CurrentThread.ManagedThreadId);
+           
+    }
 
+    private void Update()
+    {
+        if (players.Count > 0)
+        {
+            foreach (var p in players)
+            {
+                Player cp = p.Value;
+                if (p1stScore == null || cp.PlayerObject.GetComponent<PlayerScript>().score > p1stScore.PlayerObject.GetComponent<PlayerScript>().score)
+                {
+                    p1stScore = cp;
+                }
+                else if (players.Count > 1 && (p2ndScore == null || cp.PlayerObject.GetComponent<PlayerScript>().score > p2ndScore.PlayerObject.GetComponent<PlayerScript>().score))
+                {
+                    p2ndScore = cp;
+                }
+                else if (players.Count > 2 && (p3rdScore == null || cp.PlayerObject.GetComponent<PlayerScript>().score > p3rdScore.PlayerObject.GetComponent<PlayerScript>().score))
+                {
+                    p3rdScore = cp;
+                }
+            }
+
+            if (p2ndScore == null && p3rdScore == null)
+            {
+                top3Text.text = "<b>Top 3</b>\n<size=50>1st: " + p1stScore.Username + " (" + p1stScore.PlayerObject.GetComponent<PlayerScript>().score + "p)</size>";
+            }
+            else if (p3rdScore == null)
+            {
+                top3Text.text = "<b>Top 3</b>\n<size=50>1st: " + p1stScore.Username + " (" + p1stScore.PlayerObject.GetComponent<PlayerScript>().score + "p)</size>"
+                    + "<br><size=50>2nd: " + p2ndScore.Username + " (" + p2ndScore.PlayerObject.GetComponent<PlayerScript>().score + "p)</size>";
+            }
+            else if (p1stScore != null && p2ndScore != null && p3rdScore != null)
+            {
+                top3Text.text = "<b>Top 3</b>\n<size=50>1st: " + p1stScore.Username + " (" + p1stScore.PlayerObject.GetComponent<PlayerScript>().score + "p)</size>"
+                + "\n<size=50>2nd: " + p2ndScore.Username + " (" + p2ndScore.PlayerObject.GetComponent<PlayerScript>().score + "p)</size>"
+                + "\n<size=50>3rd: " + p3rdScore.Username + " (" + p3rdScore.PlayerObject.GetComponent<PlayerScript>().score + "p)</size>";
+            }
+        }
+        
     }
 
     IEnumerator WaitForClickOnStart()
     {
-        Debug.Log("in WaitForCLickOnStart");
         while (!startButtonClicked)
         {
             yield return null;
         }
-
-        Debug.Log("Button clicked");
      
-
     }
     
     public void OnStartButtonClicked()
@@ -111,26 +151,23 @@ public class ServerScript : MonoBehaviour {
 
     void StartListening()
     {
-        
-        Debug.Log("Thread.CurrentThread.ManagedThreadId (in StartListening()): " + Thread.CurrentThread.ManagedThreadId);
-
         try
         {
-            tcpListener = new TcpListener(IPAddress.Any, 0);
+            tcpListener = new TcpListener(IPAddress.Any, 5555);
             
             tcpListener.Start();
-            Debug.Log("Server started");
+            //Debug.Log("Server started");
             TcpClient connectedClient = null;
             
-            String localEndpointString = "Listening on: " + GetLocalIPAddress() + ":" + ((IPEndPoint)tcpListener.LocalEndpoint).Port.ToString();
+            String localEndpointString = "Listening on: <b>" + GetLocalIPAddress() + ":" + ((IPEndPoint)tcpListener.LocalEndpoint).Port.ToString() + "</b>";
             UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_initLocalEndpointText(localEndpointString));
             while (isRunning)
             {                            
-                Debug.Log("Before client connected");
+                //Debug.Log("Before client connected");
                 connectedClient = tcpListener.AcceptTcpClient();
-                Debug.Log("After client connected");
+                //Debug.Log("After client connected");
                 
-                Debug.Log("Aktuelle Spieleranzahl: " + players.Count);
+                //Debug.Log("Aktuelle Spieleranzahl: " + players.Count);
 
                 string ip = ((IPEndPoint)connectedClient.Client.RemoteEndPoint).Address.ToString();
                 int clientPort = ((IPEndPoint)connectedClient.Client.RemoteEndPoint).Port;
@@ -148,10 +185,10 @@ public class ServerScript : MonoBehaviour {
        
                         int remaining = receivedBuffer.Length;
                       
-                        Debug.Log("Before data read");
+                        //Debug.Log("Before data read");
                         numberOfBytesRead = ns.Read(receivedBuffer, 0, receivedBuffer.Length);
-                        Debug.Log("After data read");
-                        Debug.Log("numberOfBytes read: " + numberOfBytesRead);
+                        //Debug.Log("After data read");
+                        //Debug.Log("numberOfBytes read: " + numberOfBytesRead);
                         remaining -= numberOfBytesRead;
                 
                         if (numberOfBytesRead <= 0)
@@ -168,10 +205,10 @@ public class ServerScript : MonoBehaviour {
                         {
                             char zeichen = Convert.ToChar(receivedBuffer[i]);
                             byteCounter++;
-                            Debug.Log("byte " + byteCounter + ": " + zeichen);
+                            //Debug.Log("byte " + byteCounter + ": " + zeichen);
                             if (receivedBuffer[i].Equals(59))  // Bei einem Semikolon (59) ist die Nachricht zuende 
                             {
-                                Debug.Log("; erreicht");
+                                //Debug.Log("; erreicht");
                                 string message = msg.ToString();
                                 HandleData(connectedClient, message, ip, clientPort);
                                 if (message.Contains("DISCONNECT;"))
@@ -237,104 +274,256 @@ public class ServerScript : MonoBehaviour {
 
         string[] splitData = msgStr.Split('|');
 
-            switch (splitData[0])
-            {
-                case "CONNECT":
-                    string username = splitData[1];
-            
-                    UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(ip, username, clientPort));
+        switch (splitData[0])
+        {
+            case "CONNECT":
+                string username = splitData[1];
+
+                UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(connectedClient, ip, username, clientPort));
+                break;
+
+            case "SPAWN":
+                Debug.Log("SPAWN called for client with ip address " + ip);
+                UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer(ip));
+                break;
+
+            case "MOVE":
+                int speed;
+                if (Int32.TryParse(splitData[1], out speed))
+                    UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_Move(ip, speed));
+                else
+                    Debug.Log("Invalid argument for speed. Conversion from string to int did not succeed");
+                break;
+
+            case "ROTATE":
+                float angle;
+                angle = float.Parse(splitData[1]);
+                Debug.Log(angle);
+                UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_Rotate(ip, angle));            
+                break;
+
+            case "DRAW":
+                string color = splitData[1];                  
+                UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_DrawLine(ip, color));                  
+                break;
+
+            case "STOP_DRAWING":
+                UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_StopDrawing(ip));
+                break;
+
+            case "SHOOT":
+                UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_ShootBullet(ip));
+                break;
+
+            case "STATUS":
+                UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_GetStatus(connectedClient, ip));                       
+                break;
+
+            case "DIST":
+                UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_GetDistToWall(connectedClient, ip));
+                break;
+                
+            case "MOW":
+                UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_StartMowing(ip));
+                break;
+
+            case "STOP_MOWING":
+                UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_StopMowing(ip));
+                break;
+
+            case "DIR_VECTOR":
+                UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_GetDirVector(connectedClient, ip));
+                break;
+
+            case "SURR_PLAYERS":
+                int radius;
+                if (Int32.TryParse(splitData[1], out radius))
+                    UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_GetSurroundingPlayers(connectedClient, ip, radius));
+                else
+                    Debug.Log("Invalid argument for radius. Conversion from string to int did not succeed");
+                break;
+
+            case "SURR_PICKUPS":
+                int rad;
+                if (Int32.TryParse(splitData[1], out rad))
+                    UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_GetSurroundingPickUps(connectedClient, ip, rad));
+                else
+                    Debug.Log("Invalid argument for radius. Conversion from string to int did not succeed");
+                break;
+
+            case "DELETE":
+                    UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_DeletePlayer(ip));
                     break;
 
-                case "SPAWN":
-                    Debug.Log("SPAWN called for client with ip address " + ip);
-                    UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer(ip));
-                    break;
-
-                case "MOVE":
-                    int speed;
-                    if (Int32.TryParse(splitData[1], out speed))
-                        UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_Move(ip, speed));
-                    else
-                        Console.WriteLine("Invalid argument for speed. Conversion from string to int did not succeed");
-                                  
-                    break;
-
-                case "ROTATE":
-                    int angle;
-                    if (Int32.TryParse(splitData[1], out angle))
-                        UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_Rotate(ip, angle));
-                    else
-                        Console.WriteLine("Invalid argument for speed. Conversion from string to int did not succeed");
-                    break;
-
-                case "DRAW":
-                    string color = splitData[1];                  
-                    UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_DrawLine(ip, color));                  
-                    break;
-
-                case "STOP_DRAWING":
-                    UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_StopDrawing(ip));
-                    break;
-
-                case "SHOOT":
-                    UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_ShootBullet(ip));
-                    break;
-
-                case "STATUS":
-                    UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_GetStatus(connectedClient, ip));                       
-                    break;
-                case "DIST":
-                    UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_GetDistToWall(connectedClient, ip));
-                    break;
-                case "DELETE":
-                        UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_DeletePlayer(ip));
-                        break;
-
-                case "DISCONNECT":
-                    UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_DisconnectPlayer(ip));
-                    break;
+            case "DISCONNECT":
+                UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_DisconnectPlayer(ip));
+                break;
             }
    
     }
 
-
-
-    void SpawnPickUps()
+    void SpawnStandardPickUp()
     {
-        Debug.Log("in SpawnPickUps");
-        for (int i = 0; i < 5; i++)
+        int spawnPointX = UnityEngine.Random.Range(-49, 49);
+        int spawnPointZ = UnityEngine.Random.Range(-28, 27);
+        Vector3 spawnPosition = new Vector3(spawnPointX, 4, spawnPointZ);
+        if (pickUp.activeInHierarchy)
         {
-            int spawnPointX = UnityEngine.Random.Range(-49, 49);
-            int spawnPointZ = UnityEngine.Random.Range(-28, 27);
-            Vector3 spawnPosition = new Vector3(spawnPointX, 0, spawnPointZ);
-
-            GameObject newPickUp = Instantiate(pickUp, spawnPosition, Quaternion.identity);
-            pickUps.Add(newPickUp);
+            pickUpCopy.transform.position = spawnPosition;
+            pickUpCopy.SetActive(true);
+            pickUpCopy.GetComponent<PickUpScript>().isActive = true;
+            StartCoroutine(SetInactive(pickUpCopy, 9.9f));
         }
+        else if (pickUpCopy.activeInHierarchy)
+        {
+            pickUp.transform.position = spawnPosition;
+            pickUp.SetActive(true);
+            pickUp.GetComponent<PickUpScript>().isActive = true;
+            StartCoroutine(SetInactive(pickUp, 9.9f));
+        }
+        else
+        {
+            pickUp.transform.position = spawnPosition;
+            pickUp.SetActive(true);
+            pickUp.GetComponent<PickUpScript>().isActive = true;
+            StartCoroutine(SetInactive(pickUp, 9.9f));
+        }
+        //GameObject newPickUp = Instantiate(pickUp, spawnPosition, pickUp.transform.rotation);
 
-        Debug.Log("PickUps have been instantiated");
+        //Destroy(newPickUp, 10);
+        //pickUps.Add(newPickUp);   
     }
 
-
-    public IEnumerator ExecuteOnMainThread_AddNewPlayer(string ip, string username, int clientPort)
+    void SpawnPoisonousPickUp()
     {
-        
+        int spawnPointX = UnityEngine.Random.Range(-49, 49);
+        int spawnPointZ = UnityEngine.Random.Range(-28, 27);
+        Vector3 spawnPosition = new Vector3(spawnPointX, 1, spawnPointZ);
+        pickUpPoisonous.transform.position = spawnPosition;
+        pickUpPoisonous.SetActive(true);
+        pickUpPoisonous.GetComponent<PickUpScript>().isActive = true;
+        //GameObject newPickUp = Instantiate(pickUpPoisonous, spawnPosition, pickUp.transform.rotation);
+        StartCoroutine(SetInactive(pickUpPoisonous, 9.9f));
+        //Destroy(newPickUp, 10);
+        //pickUps.Add(newPickUp);   
+    }
+
+    void SpawnGoldenPickUp()
+    {
+        int spawnPointX = UnityEngine.Random.Range(-49, 49);
+        int spawnPointZ = UnityEngine.Random.Range(-28, 27);
+        Vector3 spawnPosition = new Vector3(spawnPointX, 6, spawnPointZ);
+        pickUpGolden.transform.position = spawnPosition;
+        pickUpGolden.SetActive(true);
+        pickUpGolden.GetComponent<PickUpScript>().isActive = true;
+        //GameObject newPickUp = Instantiate(pickUpGolden, spawnPosition, pickUp.transform.rotation);
+        StartCoroutine(SetInactive(pickUpGolden, 10));
+        //Destroy(newPickUp, 10);
+        //pickUps.Add(newPickUp);   
+    }
+
+    IEnumerator SetInactive(GameObject go, float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        go.SetActive(false);
+    }
+
+    public IEnumerator ExecuteOnMainThread_StartMowing(string ip)
+    {
+        if (players.ContainsKey(ip))
+        {
+            players[ip].PlayerObject.GetComponent<PlayerScript>().mowing = true;
+        }
+        else
+        {
+            Debug.Log("Player from " + ip + " trying to mow, but has not connected yet");
+        }
+        yield return null;
+    }
+
+    public IEnumerator ExecuteOnMainThread_StopMowing(string ip)
+    {
+        if (players.ContainsKey(ip))
+        {
+            players[ip].PlayerObject.GetComponent<PlayerScript>().mowing = false;
+        }
+        else
+        {
+            Debug.Log("Player from " + ip + " trying to stop mowing, but has not connected yet");
+        }
+        yield return null;
+    }
+
+    public IEnumerator ExecuteOnMainThread_AddNewPlayer(TcpClient client, string ip, string username, int clientPort)
+    {       
         if (!players.ContainsKey(ip))
         {
-
+            string msg = "";
+            if(username.Length > 18)
+            {
+                //msg = "{\"error\": {\"message\": \"Nutzername hat zu viele Zeichen\"}}";
+                msg = "Dein Nutzername hat zu viele Zeichen";
+                SendMessage(client, msg);
+                yield break;
+            }
             Debug.Log(username + " connected from " + ip + ":" + clientPort);
+            bool freeSpawnPosFound = false;
+            /*
+             * Collider-Array dient dem Scannen der Umgebung des Spieler-Objektes.
+             * Zum einen damit sicher gestellt ist, dass diese nicht aufeinander spawnen
+             * und zum anderen, um dem Spieler zu ermöglichen, alle Spieler in einem bestimmten 
+             * Radius abzufragen
+             */
+            Collider[] collidersInSpawnPos;
+            // Radius für Scannen der Umgebung
+            float radius = 4;
 
-            int spawnPointX = UnityEngine.Random.Range(-20, 20);
-            int spawnPointZ = UnityEngine.Random.Range(-7, 7);
-            Vector3 spawnPosition = new Vector3(spawnPointX, 0, spawnPointZ);
+            // Zähle die Anzahl der Versuche eine freie Spawn-Position zu finden
+            int loopCounter = 0;
 
+            Vector3 spawnPosition = new Vector3(0, 1.03f, 0);
+            while (!freeSpawnPosFound)
+            {
+                loopCounter++;
+                Debug.Log("loopCounter: " + loopCounter);
+                if (loopCounter > 20)
+                {
+                    Debug.Log("Kein Platz mehr auf Spielfeld");
+                    yield break;  // return
+                }
+                // Sich im Umgebungsradius befindlichen Collider in Array schreiben
+                collidersInSpawnPos = Physics.OverlapSphere(spawnPosition, radius, layerMask);
+
+                // Wenn Array nicht leer ist, dann ist mind. ein Collider im Weg
+                if (collidersInSpawnPos.Length != 0)
+                {
+                    int spawnPointX = UnityEngine.Random.Range(-20, 20);
+                    int spawnPointZ = UnityEngine.Random.Range(-7, 7);
+                    spawnPosition = new Vector3(spawnPointX, 1.03f, spawnPointZ);
+
+                    continue;  // Schleifendurchlauf neu starten
+                }
+                else
+                {
+                    freeSpawnPosFound = true;
+                }                            
+             
+            }
+            if(players.Count == playerObjectModels.Length)
+            {
+                //msg = "{\"error\": {\"message\": \"Maximale Spieleranzahl erreicht\"}}";
+                msg = "Maximale Spieleranzahl erreicht";
+                SendMessage(client, msg);
+                yield break;
+            }
+            // Dem Spieler ein Spieler-Modell zuweisen
             if (players.Count > 0)
             {
                 while (true)
                 {
                     foreach (var player in players)
                     {
-                        if (player.Value.playModelNum == playerModelNumber)
+                        if (player.Value.PlayModelNum == playerModelNumber)
                         {
                             playerModelNumber++;
                             break;
@@ -350,12 +539,17 @@ public class ServerScript : MonoBehaviour {
             }
             endOfLoop:
             GameObject temp = Instantiate(playerObjectModels[playerModelNumber], spawnPosition, Quaternion.identity);
-
+            string playerModelName = playerObjectModels[playerModelNumber].name;
+            string playerModel = playerModelName.Substring(9, playerModelName.Length - 9);
             Player newPlayer = new Player(temp, username);
             players.Add(ip, newPlayer);
-            players[ip].playModelNum = playerModelNumber;
+            players[ip].PlayModelNum = playerModelNumber;
+            players[ip].PlayerObject.GetComponent<PlayerScript>().nameTag.GetComponent<TextMesh>().text = username;
             playerModelNumber++;
             Debug.Log("Client with ip address " + ip + " added to dictionary; players.count = " + players.Count);
+            //string msg = "{\"success\": {\"message\": \"Verbindung erfolgreich hergestellt\", \"player_model\": \"" + playerModel + "\"}}";
+            msg = "Verbindung erfolgreich hergestellt! Player-Model: " + playerModel;
+            SendMessage(client, msg);
         }
         yield return null;
     }
@@ -364,12 +558,20 @@ public class ServerScript : MonoBehaviour {
 
     public IEnumerator ExecuteOnMainThread_SpawnPlayer(string ip)
     {
-        if (players.ContainsKey(ip) && !players[ip].PlayerObject.activeInHierarchy)
-        {           
-            players[ip].PlayerObject.SetActive(true);
-            string username = players[ip].Username;
-            Debug.Log(username + " spawned on the field; Player-Model: " + playerObjectModels[players[ip].playModelNum].name.Substring(6));
-                       
+        if (players.ContainsKey(ip))
+        {
+            if (!players[ip].PlayerObject.activeInHierarchy)
+            {
+                if(players[ip].PlayerObject.GetComponent<Health>().currentHealth < 0)
+                {
+                    players[ip].PlayerObject.GetComponent<Health>().currentHealth = 100;
+                    RectTransform healthBar = players[ip].PlayerObject.GetComponent<Health>().healthBar;
+                    healthBar.sizeDelta = new Vector2(100, healthBar.sizeDelta.y);
+                }              
+                players[ip].PlayerObject.SetActive(true);
+                string username = players[ip].Username;
+                Debug.Log(username + " spawned on the field; Player-Model: " + playerObjectModels[players[ip].PlayModelNum].name.Substring(9));
+            }
         }
         else
         {
@@ -391,9 +593,14 @@ public class ServerScript : MonoBehaviour {
     {
         if (players.ContainsKey(ip))
         {
-            string serverMessage = "Your current status is: " + players[ip].PlayerObject.GetComponent<Rigidbody>().velocity.magnitude + " velocity, " + players[ip].PlayerObject.GetComponent<PlayerScript>().score + " PickUps collected, " + players[ip].PlayerObject.GetComponent<Health>().currentHealth + "% health";
-            Debug.Log("serverMessage in getStatus: " + serverMessage);
-            SendMessage(connectedClient, serverMessage);
+            Transform t = players[ip].PlayerObject.GetComponent<Transform>();
+            string svrMsg = "{\"score\": " + players[ip].PlayerObject.GetComponent<PlayerScript>().score
+                + ", \"health\": \"" + players[ip].PlayerObject.GetComponent<Health>().currentHealth + "%\""
+                + ", \"velocity\": " + players[ip].PlayerObject.GetComponent<Rigidbody>().velocity.magnitude 
+                + ", \"position\": {\"x\": " + t.position.x + ", \"y\": " + t.position.y + ", \"z\": " + t.position.z + "}"
+                + ", \"rotation\": {\"x\": " + t.rotation.x + ", \"y\": " + t.rotation.y + ", \"z\": " + t.rotation.z + "}}";
+
+            SendMessage(connectedClient, svrMsg);
         }
         yield return null;
     }
@@ -408,6 +615,94 @@ public class ServerScript : MonoBehaviour {
         }
         yield return null;
     }
+
+    public IEnumerator ExecuteOnMainThread_GetDirVector(TcpClient connectedClient, string ip)
+    {
+        if (players.ContainsKey(ip))
+        {
+            Vector3 directionVector = players[ip].PlayerObject.GetComponent<PlayerScript>().directionVector;
+            string msg = "{\"x\": " + directionVector.x + ", \"y\": " + directionVector.y + ", \"z\": " + directionVector.z + "}";
+            SendMessage(connectedClient, msg);
+        }
+        yield return null;
+    }
+
+    public IEnumerator ExecuteOnMainThread_GetSurroundingPlayers(TcpClient connectedClient, string ip, float radius)
+    {
+        Debug.Log("in GetSurroundings");
+        if (players.ContainsKey(ip))
+        {
+            string msg = "[";
+            Collider[] colliders = players[ip].PlayerObject.GetComponent<PlayerScript>().GetSurroundingPlayers(radius);
+            Debug.Log("colliders.Length: " + colliders.Length);
+            Vector3 surPlayerPos;
+            foreach (var col in colliders)
+            {
+                Debug.Log("col.name: " + col.name);
+                Debug.Log("col.gameObject.transform.parent.gameObject.name: " + col.gameObject.transform.parent.gameObject.name);
+                foreach (var player in players)
+                {
+                    Debug.Log("player.Value.Username: " + player.Value.Username);
+                    if (player.Value.PlayerObject == col.gameObject.transform.parent.gameObject)
+                    {
+                        surPlayerPos = col.gameObject.transform.parent.gameObject.transform.position;
+                        Debug.Log("even deeper in GetSurroundings");
+                        if (col == colliders[colliders.Length - 1])
+                        {
+                            msg += "{\"name\": \"" + player.Value.Username + "\", \"position\" : {\"x\": " + surPlayerPos.x + ", \"y\": " + surPlayerPos.y + ", \"z\": " + surPlayerPos.z + "}}]";
+                            //msg += player.Value.Username;
+                        }
+                        else
+                        {
+                            msg += "{\"name\": \"" + player.Value.Username + "\", \"position\" : {\"x\": " + surPlayerPos.x + ", \"y\": " + surPlayerPos.y + ", \"z\": " + surPlayerPos.z + "}}, ";
+                            //msg += player.Value.Username + ", ";
+                        }                   
+                        break;
+                    }
+                }
+            }
+            if(colliders.Length == 0)
+            {
+                msg = "Es befinden sich keine Spieler-Objekte im spezifiziertem Umkreis";
+            }
+            SendMessage(connectedClient, msg);
+        }
+        yield return null;
+    }
+
+    public IEnumerator ExecuteOnMainThread_GetSurroundingPickUps(TcpClient connectedClient, string ip, float radius)
+    {
+        Debug.Log("in GetSurroundings");
+        if (players.ContainsKey(ip))
+        {
+            string msg = "[";
+            Vector3 surPickUpPos;
+            Collider[] colliders = players[ip].PlayerObject.GetComponent<PlayerScript>().GetSurroundingPickUps(radius);
+            Debug.Log("colliders.Length: " + colliders.Length);
+            foreach (var col in colliders)
+            {
+                Debug.Log("col.name: " + col.name);
+                surPickUpPos = col.gameObject.transform.position;
+                if (col == colliders[colliders.Length - 1])
+                {
+                    msg += "{\"name\": \"" + col.name + "\", \"position\": {\"x\": " + surPickUpPos.x + ", \"y\": " + surPickUpPos.y + ", \"z\": " + surPickUpPos.z + "}}]";
+                    //msg += player.Value.Username;
+                }
+                else
+                {
+                    msg += "{\"name\": \"" + col.name + "\", \"position\": {\"x\": " + surPickUpPos.x + ", \"y\": " + surPickUpPos.y + ", \"z\": " + surPickUpPos.z + "}}, ";
+                    //msg += player.Value.Username + ", ";
+                }
+            }
+            if (colliders.Length == 0)
+            {
+                msg = "Es befinden sich keine Pick-Ups im spezifiziertem Umkreis";
+            }
+            SendMessage(connectedClient, msg);
+        }
+        yield return null;
+    }
+
     public IEnumerator ExecuteOnMainThread_initLocalEndpointText(string msg)
     {
         lEndpointText.text = msg;
@@ -458,43 +753,28 @@ public class ServerScript : MonoBehaviour {
             //Rigidbody.MovePosition(Vector3) to set your new position
             Vector3 forwardVel = players[ip].PlayerObject.GetComponent<Transform>().forward * speed;
             Vector3 horizontalVel = players[ip].PlayerObject.GetComponent<Transform>().right * speed;
+            //Vector3 movement ;
+            
+            //movement.Set(horizontalMove, 0.0f, verticalMove);
+            //players[ip].PlayerObject.GetComponent<Rigidbody>().AddForce(forwardVel + horizontalVel, ForceMode.Acceleration);
+            //players[ip].PlayerObject.GetComponent<Rigidbody>().AddForce(-horizontalVel, ForceMode.Impulse);
+            // players[ip].PlayerObject.GetComponent<Rigidbody>().MovePosition(transform.position + forwardVel + horizontalVel);
+            // Vector3 horizontalVel = players[ip].PlayerObject.GetComponent<Transform>().Translate(forwardVel + horizontalVel);
+            players[ip].PlayerObject.GetComponent<Rigidbody>().velocity = horizontalVel + forwardVel;
 
-         
-            players[ip].PlayerObject.GetComponent<Rigidbody>().velocity = forwardVel + horizontalVel;
-
-            /*      float moveHorizontal = 0f;
-                    float moveVertical = 0f;
-
-                    direction = direction.ToUpper();
-                    switch (direction)
-                    {
-                        case "UP":
-                            moveVertical = 1f;
-                            break;
-                        case "DOWN":
-                            moveVertical = -1f;
-                            break;
-                        case "LEFT":
-                            moveHorizontal = -1f;
-                            break;
-                        case "RIGHT":
-                            moveHorizontal = 1f;
-                            break;
-                    }
-
-                    Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
-                    players[ip].PlayerObject.GetComponent<Rigidbody>().velocity = movement * speed;
-            */
-            //string username = players[ip].Username;
-            //Debug.Log(username + " moved position, speed: " + players[ip].PlayerObject.GetComponent<Rigidbody>().velocity.magnitude);
         }
         yield return null;
     }
 
-    public IEnumerator ExecuteOnMainThread_Rotate(string ip, int angle)
+    public IEnumerator ExecuteOnMainThread_Rotate(string ip, float angle)
     {
         if (players.ContainsKey(ip))
         {
+            //Rigidbody rb = players[ip].PlayerObject.GetComponent<Rigidbody>();
+            //Set the axis the Rigidbody rotates in (100 in the y axis)
+            //Vector3 eulerAngleVelocity = new Vector3(0, angle, 0);
+            //Quaternion deltaRotation = Quaternion.Euler(eulerAngleVelocity * Time.deltaTime * 50);
+            //rb.MoveRotation(rb.rotation * deltaRotation);
             players[ip].PlayerObject.transform.Rotate(new Vector3(0, angle, 0));
             UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_Move(ip, (int)players[ip].PlayerObject.GetComponent<Rigidbody>().velocity.magnitude));
             string username = players[ip].Username;
@@ -532,19 +812,16 @@ public class ServerScript : MonoBehaviour {
         {
             serverMessage = serverMessage + ";\n";
             Debug.Log("ServerMessage: " + serverMessage);
-            Debug.Log("in SendMessage");
-   
+       
             NetworkStream stream = client.GetStream();
             if (stream.CanWrite)
             {
-
-                Debug.Log("im if statement in SendMessage");
                 byte[] serverMessageAsByteArray = Encoding.ASCII.GetBytes(serverMessage);
                             
                 stream.Write(serverMessageAsByteArray, 0, serverMessageAsByteArray.Length);
                 stream.Flush();
                 //stream.Close();
-                Debug.Log("message sent; message: " + serverMessage + " (nach dem flush in SendMessage)");
+                //Debug.Log("message sent; message: " + serverMessage + " (nach dem flush in SendMessage)");
             }
             else
             {
@@ -570,26 +847,29 @@ public class ServerScript : MonoBehaviour {
         throw new Exception("No network adapters with an IPv4 address in the system!");
     }
 
-    void RemovePickUps()
-    {
-        Debug.Log("in RemovePickUps");
+    //void RemovePickUps()
+    //{
+    //    Debug.Log("in RemovePickUps");
 
-        foreach (var pickUp in pickUps)
-        {
-            Destroy(pickUp.gameObject);
-        }
-        pickUps.Clear();
-        Debug.Log("PickUps have been removed from the field");
-    }
+    //    foreach (var pickUp in pickUps)
+    //    {
+    //        Destroy(pickUp.gameObject);
+    //    }
+    //    pickUps.Clear();
+    //    Debug.Log("PickUps have been removed from the field");
+    //}
 
     void RemoveAllPlayers()
     {
-        Debug.Log("in RemoveAllPlayers");
         foreach (var player in players)
         {
             Destroy(player.Value.PlayerObject);
         }
         players.Clear();
+        p1stScore = null;
+        p2ndScore = null;
+        p3rdScore = null;
+        top3Text.text = "";
         Debug.Log("All players have been removed from the field");
     }
 
@@ -618,9 +898,8 @@ public class ServerScript : MonoBehaviour {
 
     void OnApplicationQuit()
     {
-        Debug.Log("in OnApplicationQuit");
         StopListening();
-        RemovePickUps();
+        //RemovePickUps();
         RemoveAllPlayers();
  
         try
