@@ -21,6 +21,7 @@ public class PlayerScript : MonoBehaviour {
     public GameObject nameTag;
     public Vector3 directionVector;
     protected int[,,] TerrainBackup;
+    public string playerIP;
 
     void Start () {
         GetComponent<Rigidbody>().inertiaTensorRotation = Quaternion.identity;
@@ -39,8 +40,9 @@ public class PlayerScript : MonoBehaviour {
         //transform.rotation.Set(0, transform.rotation.y, 0, transform.rotation.w);
         //Debug.Log("1  " + transform.rotation.x + " ; " + transform.rotation.z + " ; " + transform.rotation.z);
         //transform.Rotate(new Vector3(0, transform.rotation.y, 0));
-        directionVector = Vector3.Normalize(slightForwardPoint.transform.position - transform.position);
-        landingRay = new Ray(transform.position, directionVector);
+        directionVector = slightForwardPoint.transform.position - transform.position;
+        Vector3 directionVector2 = Vector3.Normalize(slightForwardPoint.transform.position - transform.position);
+        landingRay = new Ray(transform.position, directionVector2);  
         //Debug.DrawRay(transform.position, Vector3.Normalize(slightForwardPoint.transform.position - transform.position) * raycastDistance);
         if (Physics.Raycast(landingRay, out hit, raycastDistance))
         {
@@ -178,10 +180,10 @@ public class PlayerScript : MonoBehaviour {
             bulletPrefab,
             bulletSpawn.position,
             bulletSpawn.rotation);
-
+        
         // Add velocity to the bullet
         bullet.GetComponent<Rigidbody>().velocity = (transform.forward + transform.right) * bulletSpeed;
-
+        bullet.GetComponent<Bullet>().shotCameFromPlayerIP = playerIP;
         // Destroy the bullet after 2 seconds
         Destroy(bullet, 4.0f);
     }

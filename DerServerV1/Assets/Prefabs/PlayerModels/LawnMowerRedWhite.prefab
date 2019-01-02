@@ -1581,10 +1581,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentHealth: 100
-  healthBar: {fileID: 0}
-  deathEffect: {fileID: 198463547806617144, guid: 15d2a2d0de26f8f459c505ac46befbe7,
+  healthBar: {fileID: 224244420630657622}
+  deathEffect: {fileID: 198668980422534712, guid: b3d1f901ff2399b47b9d8c1aac441f89,
     type: 2}
-  highScoreText: {fileID: 0}
+  highScoreText: {fileID: 114983940406511030, guid: 722419624bb5b054d85611ba023b7e4a,
+    type: 2}
+  serverScript: {fileID: 1694307060365742, guid: 984ce53dd54b95545aad623b9fd05679,
+    type: 2}
 --- !u!114 &114546950457094580
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1656,7 +1659,6 @@ MonoBehaviour:
   terrain: {fileID: 0}
   nameTag: {fileID: 1661722389777212}
   directionVector: {x: 0, y: 0, z: 0}
-  playerName: 
 --- !u!135 &135384526887927344
 SphereCollider:
   m_ObjectHideFlags: 1

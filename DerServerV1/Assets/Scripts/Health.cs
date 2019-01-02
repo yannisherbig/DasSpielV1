@@ -16,21 +16,64 @@ public class Health : MonoBehaviour
     {
         //maxHealthBarSize = healthBar.sizeDelta.x;
     }
-    public void TakeDamage(int amount)
+
+    public void TakeDamage(int amount, string hitCameFromPlayerIP)
     {
         currentHealth -= amount;
         if (currentHealth <= 0)
         {
+            Destroy(Instantiate(deathEffect.gameObject, gameObject.transform.position, Quaternion.identity) as GameObject, deathEffect.main.startLifetime.constant);
             currentHealth = 0;
-            gameObject.SetActive(false);
+            foreach (var mr in gameObject.GetComponentsInChildren<MeshRenderer>())
+            {
+                StartCoroutine(FadeTo(mr.material, 0f, 2f)); // Start a coroutine to fade the material to zero alpha over 2 seconds and disable the GameObject
+            }
+            StartCoroutine(SetInactive(gameObject, 2.01f));
             int score = gameObject.GetComponent<PlayerScript>().score;
-            Destroy(Instantiate(deathEffect.gameObject, gameObject.transform.position, Quaternion.identity) as GameObject , deathEffect.main.startLifetime.constant);
             if(score > serverScript.GetComponent<ServerScript>().highScore)
                 highScoreText.text = "<b>Highscore</b>\n<size=50>" + gameObject.GetComponent<PlayerScript>().nameTag.GetComponent<TextMesh>().text + " (" + score + "p)</size>";
             gameObject.GetComponent<PlayerScript>().score = 0;
+            serverScript.GetComponent<ServerScript>().players[hitCameFromPlayerIP].PlayerObject.GetComponent<PlayerScript>().score++;
         }
         healthBar.sizeDelta = new Vector2(currentHealth, healthBar.sizeDelta.y);
         Debug.Log("healthBar.sizeDelta: " + healthBar.sizeDelta + " ; healthBar.sizeDelta.x: " + healthBar.sizeDelta.x + " ; healthBar.sizeDelta.y: " + healthBar.sizeDelta.y);
         //healthBar.sizeDelta = new Vector2(((float)currentHealth / maxHeath) * maxHealthBarSize, healthBar.sizeDelta.y);
+    }
+
+    IEnumerator SetInactive(GameObject go, float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        go.SetActive(false);
+    }
+
+    // Define an enumerator to perform our fading.
+    // Pass it the material to fade, the opacity to fade to (0 = transparent, 1 = opaque),
+    // and the number of seconds to fade over.
+    IEnumerator FadeTo(Material material, float targetOpacity, float duration)
+    {
+        // Cache the current color of the material, and its initiql opacity.
+        Color color = material.color;
+        float startOpacity = color.a;
+
+        // Track how many seconds we've been fading.
+        float t = 0;
+
+        while (t < duration)
+        {
+            // Step the fade forward one frame.
+            t += Time.deltaTime;
+            // Turn the time into an interpolation factor between 0 and 1.
+            float blend = Mathf.Clamp01(t / duration);
+
+            // Blend to the corresponding opacity between start & target.
+            color.a = Mathf.Lerp(startOpacity, targetOpacity, blend);
+
+            // Apply the resulting color to the material.
+            material.color = color;
+
+            // Wait one frame, and repeat.
+            yield return null;
+        }
+
     }
 }

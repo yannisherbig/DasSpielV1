@@ -1527,8 +1527,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentHealth: 100
-  healthBar: {fileID: 0}
-  deathEffect: {fileID: 198463547806617144, guid: 15d2a2d0de26f8f459c505ac46befbe7,
+  healthBar: {fileID: 224364435117569724}
+  deathEffect: {fileID: 198668980422534712, guid: b3d1f901ff2399b47b9d8c1aac441f89,
     type: 2}
   highScoreText: {fileID: 0}
   serverScript: {fileID: 0}

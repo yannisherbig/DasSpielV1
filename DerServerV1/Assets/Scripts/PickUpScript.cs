@@ -10,7 +10,7 @@ public class PickUpScript : MonoBehaviour
     
     void Start()
     {
-        this.originalY = this.transform.position.y;
+        originalY = transform.position.y;
     }
 
     void Update()

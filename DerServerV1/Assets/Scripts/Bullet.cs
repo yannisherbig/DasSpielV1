@@ -4,21 +4,32 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour {
 
+    public ParticleSystem explosionEffect;
+    public bool detectedBefore = false;
+    public string shotCameFromPlayerIP;
+
     void OnCollisionEnter(Collision collision)
     {
         Destroy(gameObject);
-        // Hit effect here: ...
-
+        Destroy(Instantiate(explosionEffect.gameObject, gameObject.transform.position, Quaternion.identity) as GameObject, explosionEffect.main.startLifetime.constant);
         var hit = collision.gameObject;
-        Debug.Log("Coll detected, hit = " + hit.name);
-        if (hit.tag.Equals("Player"))
+        //Debug.Log("Coll detected, hit = " + hit.name);
+
+        if (hit.tag.Equals("Player") && !detectedBefore)
         {
-            Debug.Log("player Coll detected");
+            detectedBefore = true;
+            //Debug.Log("player Coll detected");
             var health = hit.GetComponent<Health>();
             if (health != null)
             {
-                health.TakeDamage(10);
+                health.TakeDamage(10, shotCameFromPlayerIP);
             }
         }
     }
+
+    //void OnCollisionExit(Collision collisionInfo)
+    //{
+    //    Debug.Log("Collision Out: " + gameObject.name);
+    //    Debug.Log("Collision Out: " + collisionInfo.gameObject.tag);
+    //}
 }

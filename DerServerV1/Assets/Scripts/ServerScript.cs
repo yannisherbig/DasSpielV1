@@ -89,6 +89,11 @@ public class ServerScript : MonoBehaviour {
             InvokeRepeating("SpawnPoisonousPickUp", 6, 12);
             InvokeRepeating("SpawnGoldenPickUp", 29, 29);
         }
+
+        // Die Auskommentierung der unteren beiden Zeilen rückgängig machen, um einen Dummy-Player-Objekt für Testzwecke zu haben
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.999", "Dummy Dummyman", 99999));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.999"));
+
         ThreadStart ts = new ThreadStart(StartListening);
         tcpListenerThread = new Thread(ts);
         tcpListenerThread.Start();
@@ -105,14 +110,19 @@ public class ServerScript : MonoBehaviour {
                 if (p1stScore == null || cp.PlayerObject.GetComponent<PlayerScript>().score > p1stScore.PlayerObject.GetComponent<PlayerScript>().score)
                 {
                     p1stScore = cp;
+                    if (cp == p2ndScore)
+                        p2ndScore = null;                   
                 }
-                else if (players.Count > 1 && (p2ndScore == null || cp.PlayerObject.GetComponent<PlayerScript>().score > p2ndScore.PlayerObject.GetComponent<PlayerScript>().score))
+                else if (players.Count > 1 && (p2ndScore == null || cp.PlayerObject.GetComponent<PlayerScript>().score > p2ndScore.PlayerObject.GetComponent<PlayerScript>().score) && (cp != p1stScore))
                 {
                     p2ndScore = cp;
+                    if (cp == p3rdScore)
+                        p3rdScore = null;
                 }
-                else if (players.Count > 2 && (p3rdScore == null || cp.PlayerObject.GetComponent<PlayerScript>().score > p3rdScore.PlayerObject.GetComponent<PlayerScript>().score))
+                else if (players.Count > 2 && (p3rdScore == null || cp.PlayerObject.GetComponent<PlayerScript>().score > p3rdScore.PlayerObject.GetComponent<PlayerScript>().score) && (cp != p1stScore) && (cp != p2ndScore))
                 {
-                    p3rdScore = cp;
+                    if (cp != p1stScore && cp != p3rdScore)
+                        p3rdScore = cp;
                 }
             }
 
@@ -123,7 +133,7 @@ public class ServerScript : MonoBehaviour {
             else if (p3rdScore == null)
             {
                 top3Text.text = "<b>Top 3</b>\n<size=50>1st: " + p1stScore.Username + " (" + p1stScore.PlayerObject.GetComponent<PlayerScript>().score + "p)</size>"
-                    + "<br><size=50>2nd: " + p2ndScore.Username + " (" + p2ndScore.PlayerObject.GetComponent<PlayerScript>().score + "p)</size>";
+                    + "\n<size=50>2nd: " + p2ndScore.Username + " (" + p2ndScore.PlayerObject.GetComponent<PlayerScript>().score + "p)</size>";
             }
             else if (p1stScore != null && p2ndScore != null && p3rdScore != null)
             {
@@ -278,7 +288,6 @@ public class ServerScript : MonoBehaviour {
         {
             case "CONNECT":
                 string username = splitData[1];
-
                 UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(connectedClient, ip, username, clientPort));
                 break;
 
@@ -485,7 +494,6 @@ public class ServerScript : MonoBehaviour {
             while (!freeSpawnPosFound)
             {
                 loopCounter++;
-                Debug.Log("loopCounter: " + loopCounter);
                 if (loopCounter > 20)
                 {
                     Debug.Log("Kein Platz mehr auf Spielfeld");
@@ -539,12 +547,16 @@ public class ServerScript : MonoBehaviour {
             }
             endOfLoop:
             GameObject temp = Instantiate(playerObjectModels[playerModelNumber], spawnPosition, Quaternion.identity);
+            temp.GetComponent<Health>().highScoreText = highscoreText;
             string playerModelName = playerObjectModels[playerModelNumber].name;
             string playerModel = playerModelName.Substring(9, playerModelName.Length - 9);
             Player newPlayer = new Player(temp, username);
             players.Add(ip, newPlayer);
             players[ip].PlayModelNum = playerModelNumber;
             players[ip].PlayerObject.GetComponent<PlayerScript>().nameTag.GetComponent<TextMesh>().text = username;
+            players[ip].PlayerObject.GetComponent<PlayerScript>().playerIP = ip;
+            players[ip].PlayerObject.GetComponent<Health>().serverScript = gameObject;
+            players[ip].PlayerObject.GetComponent<Health>().highScoreText = highscoreText;
             playerModelNumber++;
             Debug.Log("Client with ip address " + ip + " added to dictionary; players.count = " + players.Count);
             //string msg = "{\"success\": {\"message\": \"Verbindung erfolgreich hergestellt\", \"player_model\": \"" + playerModel + "\"}}";
@@ -553,8 +565,6 @@ public class ServerScript : MonoBehaviour {
         }
         yield return null;
     }
-
-    
 
     public IEnumerator ExecuteOnMainThread_SpawnPlayer(string ip)
     {
@@ -567,6 +577,48 @@ public class ServerScript : MonoBehaviour {
                     players[ip].PlayerObject.GetComponent<Health>().currentHealth = 100;
                     RectTransform healthBar = players[ip].PlayerObject.GetComponent<Health>().healthBar;
                     healthBar.sizeDelta = new Vector2(100, healthBar.sizeDelta.y);
+                    bool freeSpawnPosFound = false;
+                    /*
+                     * Collider-Array dient dem Scannen der Umgebung des Spieler-Objektes.
+                     * Zum einen damit sicher gestellt ist, dass diese nicht aufeinander spawnen
+                     * und zum anderen, um dem Spieler zu ermöglichen, alle Spieler in einem bestimmten 
+                     * Radius abzufragen
+                     */
+                    Collider[] collidersInSpawnPos;
+                    // Radius für Scannen der Umgebung
+                    float radius = 4;
+
+                    // Zähle die Anzahl der Versuche eine freie Spawn-Position zu finden
+                    int loopCounter = 0;
+
+                    Vector3 spawnPosition = new Vector3(0, 1.03f, 0);
+                    while (!freeSpawnPosFound)
+                    {
+                        loopCounter++;
+                        if (loopCounter > 20)
+                        {
+                            Debug.Log("Kein Platz mehr auf Spielfeld");
+                            yield break;  // return
+                        }
+                        // Sich im Umgebungsradius befindlichen Collider in Array schreiben
+                        collidersInSpawnPos = Physics.OverlapSphere(spawnPosition, radius, layerMask);
+
+                        // Wenn Array nicht leer ist, dann ist mind. ein Collider im Weg
+                        if (collidersInSpawnPos.Length != 0)
+                        {
+                            int spawnPointX = UnityEngine.Random.Range(-20, 20);
+                            int spawnPointZ = UnityEngine.Random.Range(-7, 7);
+                            spawnPosition = new Vector3(spawnPointX, 1.03f, spawnPointZ);
+
+                            continue;  // Schleifendurchlauf neu starten
+                        }
+                        else
+                        {
+                            freeSpawnPosFound = true;
+                        }
+
+                    }
+                    players[ip].PlayerObject.GetComponent<Transform>().position = spawnPosition;
                 }              
                 players[ip].PlayerObject.SetActive(true);
                 string username = players[ip].Username;
@@ -776,7 +828,10 @@ public class ServerScript : MonoBehaviour {
             //Quaternion deltaRotation = Quaternion.Euler(eulerAngleVelocity * Time.deltaTime * 50);
             //rb.MoveRotation(rb.rotation * deltaRotation);
             players[ip].PlayerObject.transform.Rotate(new Vector3(0, angle, 0));
-            UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_Move(ip, (int)players[ip].PlayerObject.GetComponent<Rigidbody>().velocity.magnitude));
+
+
+           // UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_Move(ip, (int)players[ip].PlayerObject.GetComponent<Rigidbody>().velocity.magnitude));
+
             string username = players[ip].Username;
             //Debug.Log(username + " performed a rotation on the y-axis which is now at " + players[ip].PlayerObject.transform.rotation.y);
         }
