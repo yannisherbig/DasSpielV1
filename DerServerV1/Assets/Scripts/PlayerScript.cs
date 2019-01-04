@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,19 +23,24 @@ public class PlayerScript : MonoBehaviour {
     public Vector3 directionVector;
     protected int[,,] TerrainBackup;
     public string playerIP;
+    public Material grassMaterial;
+    public GameObject trailRendererPos;
 
     void Start () {
         GetComponent<Rigidbody>().inertiaTensorRotation = Quaternion.identity;
         terrain = Terrain.activeTerrain;
+        //GetComponent<TrailRenderer>().transform.position = new Vector3(transform.position.x - 2, transform.position.y - 0.3f, transform.position.z - 2);
     }
 
     void Update()
     {
         //if (mowing)
         //{
-        //    CutGrass(terrain, transform.position, 4);
+        //    //CutGrass(terrain, transform.position, 4);
         //    //DetailMapCutoff(terrain, 0);
+        //    StartTheMow();
         //}
+
 
         //transform.eulerAngles = new Vector3(0, transform.rotation.y, 0);
         //transform.rotation.Set(0, transform.rotation.y, 0, transform.rotation.w);
@@ -51,6 +57,27 @@ public class PlayerScript : MonoBehaviour {
                 distToWallAhead = hit.distance;
             }
         }
+    }
+
+    public void StartTheMow()
+    {
+        //TrailRenderer tr = GetComponent<TrailRenderer>();
+        TrailRenderer tr = trailRendererPos.GetComponent<TrailRenderer>();
+        tr.Clear();
+        //Vector3 newPos = GetComponent<Transform>().forward + GetComponent<Transform>().right;
+        //newPos = newPos(newPos.x)
+        //tr.transform.position = new Vector3(transform.position.x, transform.position.y - 0.5f, transform.position.z);
+        Debug.Log("trM: " + tr.material);
+        tr.material = grassMaterial;
+        Debug.Log("trM: " + tr.material);
+        tr.startWidth = 0.7f;
+        tr.endWidth = 0.7f;
+        tr.time = 30;
+    }
+
+    public void StopTheMow()
+    {
+        trailRendererPos.GetComponent<TrailRenderer>().time = 0;
     }
 
     private Vector3 ConvertToSplatMapCoordinate(Vector3 playerPos)
@@ -107,7 +134,7 @@ public class PlayerScript : MonoBehaviour {
         Debug.Log("terrainLocalPos: " + terrainLocalPos);
         Debug.Log("t.terrainData.size.x: " + t.terrainData.size.x);
         Debug.Log("t.terrainData.size.y: " + t.terrainData.size.z);
-        
+
         Vector2 normalizedPos = new Vector2(Mathf.InverseLerp(0.0f, t.terrainData.size.x, terrainLocalPos.x),
             Mathf.InverseLerp(0.0f, t.terrainData.size.z, terrainLocalPos.z));
         Debug.Log("normalizedPos before multiplication: " + normalizedPos);
@@ -150,7 +177,7 @@ public class PlayerScript : MonoBehaviour {
             t.terrainData.SetDetailLayer(0, 0, layerNum, detailLayer);
         }
 
-      
+
     }
 
     private void OnTriggerEnter(Collider other)
@@ -180,7 +207,7 @@ public class PlayerScript : MonoBehaviour {
             bulletPrefab,
             bulletSpawn.position,
             bulletSpawn.rotation);
-        
+
         // Add velocity to the bullet
         bullet.GetComponent<Rigidbody>().velocity = (transform.forward + transform.right) * bulletSpeed;
         bullet.GetComponent<Bullet>().shotCameFromPlayerIP = playerIP;
@@ -205,6 +232,11 @@ public class PlayerScript : MonoBehaviour {
         return collidersInSurrounding;
     }
 
+    /*
+    * Scannen der Umgebung des Spieler-Objektes,
+    * um dem Spieler zu ermöglichen, alle Pick-Ups in einem bestimmten 
+    * Radius abzufragens
+    */
     public Collider[] GetSurroundingPickUps(float radius)
     {
         // Es wird nur die PickUp-Layer benötigt
@@ -220,12 +252,12 @@ public class PlayerScript : MonoBehaviour {
     public void CutGrass(Terrain t, Vector3 position, int radius)
     {
         if (t == null)
-            t = GameObject.FindObjectOfType<Terrain>();
+            t = Terrain.activeTerrain;
 
         int TerrainDetailMapSize = t.terrainData.detailResolution;
         if (t.terrainData.size.x != t.terrainData.size.z)
         {
-            Debug.Log("X and Y Size of terrain have to be the same (RemoveGrass.CS Line 43)");
+            Debug.Log("X and Y Size of terrain have to be the same");
             return;
         }
 

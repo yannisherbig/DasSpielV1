@@ -317,7 +317,6 @@ GameObject:
   - component: {fileID: 4640483684628452}
   - component: {fileID: 54271658033145050}
   - component: {fileID: 114515170122013750}
-  - component: {fileID: 96743398596654496}
   - component: {fileID: 114625245152903616}
   m_Layer: 9
   m_Name: LawnMowerBluePurple
@@ -326,6 +325,22 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
+--- !u!1 &1773030742204364
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4924043644455198}
+  - component: {fileID: 96213634217514626}
+  m_Layer: 9
+  m_Name: TrailRendererCustom
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1932483334195776
 GameObject:
   m_ObjectHideFlags: 0
@@ -580,6 +595,7 @@ Transform:
   - {fileID: 4890421310632310}
   - {fileID: 4241216392530602}
   - {fileID: 4799069032113408}
+  - {fileID: 4924043644455198}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -665,6 +681,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4640483684628452}
   m_RootOrder: 12
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4924043644455198
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1773030742204364}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.199, y: -0.8, z: 0.122}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4640483684628452}
+  m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4939170360184324
 Transform:
@@ -1402,13 +1431,13 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!96 &96743398596654496
+--- !u!96 &96213634217514626
 TrailRenderer:
   serializedVersion: 2
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1619858909601018}
+  m_GameObject: {fileID: 1773030742204364}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -1489,7 +1518,7 @@ TrailRenderer:
     numCornerVertices: 0
     numCapVertices: 0
     alignment: 0
-    textureMode: 0
+    textureMode: 3
     generateLightingData: 0
   m_MinVertexDistance: 0.1
   m_Autodestruct: 0
@@ -1613,6 +1642,9 @@ MonoBehaviour:
   terrain: {fileID: 0}
   nameTag: {fileID: 1610626940294014}
   directionVector: {x: 0, y: 0, z: 0}
+  playerIP: 
+  grassMaterial: {fileID: 2100000, guid: c448d4c94340e084b89f74b5b26b94f1, type: 2}
+  trailRendererPos: {fileID: 1773030742204364}
 --- !u!114 &114538294884712232
 MonoBehaviour:
   m_ObjectHideFlags: 1

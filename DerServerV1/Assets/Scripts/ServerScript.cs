@@ -70,6 +70,9 @@ public class ServerScript : MonoBehaviour {
     // Layer-Maske für Physics.OverlapSphere()
     int layerMask;
 
+    // Material für TrailRenderer
+    public Material trailMaterial;
+
     IEnumerator Start() {
         startButtonClicked = false;
         modalPanelObject.SetActive(true);
@@ -441,7 +444,8 @@ public class ServerScript : MonoBehaviour {
     {
         if (players.ContainsKey(ip))
         {
-            players[ip].PlayerObject.GetComponent<PlayerScript>().mowing = true;
+            //players[ip].PlayerObject.GetComponent<PlayerScript>().mowing = true;
+            players[ip].PlayerObject.GetComponent<PlayerScript>().StartTheMow();
         }
         else
         {
@@ -454,7 +458,8 @@ public class ServerScript : MonoBehaviour {
     {
         if (players.ContainsKey(ip))
         {
-            players[ip].PlayerObject.GetComponent<PlayerScript>().mowing = false;
+            //players[ip].PlayerObject.GetComponent<PlayerScript>().mowing = false;
+            players[ip].PlayerObject.GetComponent<PlayerScript>().StopTheMow();
         }
         else
         {
@@ -572,7 +577,7 @@ public class ServerScript : MonoBehaviour {
         {
             if (!players[ip].PlayerObject.activeInHierarchy)
             {
-                if(players[ip].PlayerObject.GetComponent<Health>().currentHealth < 0)
+                if(players[ip].PlayerObject.GetComponent<Health>().currentHealth <= 0)
                 {
                     players[ip].PlayerObject.GetComponent<Health>().currentHealth = 100;
                     RectTransform healthBar = players[ip].PlayerObject.GetComponent<Health>().healthBar;
@@ -681,7 +686,7 @@ public class ServerScript : MonoBehaviour {
 
     public IEnumerator ExecuteOnMainThread_GetSurroundingPlayers(TcpClient connectedClient, string ip, float radius)
     {
-        Debug.Log("in GetSurroundings");
+        //Debug.Log("in GetSurroundings");
         if (players.ContainsKey(ip))
         {
             string msg = "[";
@@ -690,15 +695,15 @@ public class ServerScript : MonoBehaviour {
             Vector3 surPlayerPos;
             foreach (var col in colliders)
             {
-                Debug.Log("col.name: " + col.name);
-                Debug.Log("col.gameObject.transform.parent.gameObject.name: " + col.gameObject.transform.parent.gameObject.name);
+                //Debug.Log("col.name: " + col.name);
+                //Debug.Log("col.gameObject.transform.parent.gameObject.name: " + col.gameObject.transform.parent.gameObject.name);
                 foreach (var player in players)
                 {
-                    Debug.Log("player.Value.Username: " + player.Value.Username);
+                    //Debug.Log("player.Value.Username: " + player.Value.Username);
                     if (player.Value.PlayerObject == col.gameObject.transform.parent.gameObject)
                     {
                         surPlayerPos = col.gameObject.transform.parent.gameObject.transform.position;
-                        Debug.Log("even deeper in GetSurroundings");
+                        //Debug.Log("even deeper in GetSurroundings");
                         if (col == colliders[colliders.Length - 1])
                         {
                             msg += "{\"name\": \"" + player.Value.Username + "\", \"position\" : {\"x\": " + surPlayerPos.x + ", \"y\": " + surPlayerPos.y + ", \"z\": " + surPlayerPos.z + "}}]";
@@ -765,8 +770,10 @@ public class ServerScript : MonoBehaviour {
     {
         if (players.ContainsKey(ip))
         {
-            Material m = players[ip].PlayerObject.GetComponent<TrailRenderer>().material;
-
+            TrailRenderer tr = players[ip].PlayerObject.GetComponent<PlayerScript>().trailRendererPos.GetComponent<TrailRenderer>();
+            tr.Clear();
+            //Material m = tr.material;
+            Material m = trailMaterial; 
             switch (color)
             {
                 case "Red":
@@ -785,7 +792,10 @@ public class ServerScript : MonoBehaviour {
                     m.color = new Color(255, 255, 255, 255);
                     break;
             }
-            players[ip].PlayerObject.GetComponent<TrailRenderer>().time = 30;
+            tr.material = m;
+            tr.startWidth = 0.2f;
+            tr.endWidth = 0.2f;
+            tr.time = 30;
         }
         yield return null;
     }
@@ -794,7 +804,7 @@ public class ServerScript : MonoBehaviour {
     {
         if (players.ContainsKey(ip))
         {
-            players[ip].PlayerObject.GetComponent<TrailRenderer>().time = 0;
+            players[ip].PlayerObject.GetComponent<PlayerScript>().trailRendererPos.GetComponent<TrailRenderer>().time = 0;
         }
         yield return null;
     }
