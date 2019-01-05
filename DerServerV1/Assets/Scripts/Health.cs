@@ -29,10 +29,7 @@ public class Health : MonoBehaviour
                 StartCoroutine(FadeTo(mr.material, 0f, 2f)); // Start a coroutine to fade the material to zero alpha over 2 seconds and disable the GameObject
             }
             StartCoroutine(SetInactive(gameObject, 2.01f));
-            int score = gameObject.GetComponent<PlayerScript>().score;
-            if(score > serverScript.GetComponent<ServerScript>().highScore)
-                highScoreText.text = "<b>Highscore</b>\n<size=50>" + gameObject.GetComponent<PlayerScript>().nameTag.GetComponent<TextMesh>().text + " (" + score + "p)</size>";
-            gameObject.GetComponent<PlayerScript>().score = 0;
+            UpdateScore();
             serverScript.GetComponent<ServerScript>().players[hitCameFromPlayerIP].PlayerObject.GetComponent<PlayerScript>().score++;
         }
         healthBar.sizeDelta = new Vector2(currentHealth, healthBar.sizeDelta.y);
@@ -40,6 +37,13 @@ public class Health : MonoBehaviour
         //healthBar.sizeDelta = new Vector2(((float)currentHealth / maxHeath) * maxHealthBarSize, healthBar.sizeDelta.y);
     }
 
+    public void UpdateScore()
+    {
+        int score = gameObject.GetComponent<PlayerScript>().score;
+        if (score > serverScript.GetComponent<ServerScript>().highScore)
+            highScoreText.text = "<b>Highscore</b>\n<size=50>" + gameObject.GetComponent<PlayerScript>().nameTag.GetComponent<TextMesh>().text + " (" + score + "p)</size>";
+        gameObject.GetComponent<PlayerScript>().score = 0;
+    }
     IEnumerator SetInactive(GameObject go, float seconds)
     {
         yield return new WaitForSeconds(seconds);
@@ -49,7 +53,7 @@ public class Health : MonoBehaviour
     // Define an enumerator to perform our fading.
     // Pass it the material to fade, the opacity to fade to (0 = transparent, 1 = opaque),
     // and the number of seconds to fade over.
-    IEnumerator FadeTo(Material material, float targetOpacity, float duration)
+    public IEnumerator FadeTo(Material material, float targetOpacity, float duration)
     {
         // Cache the current color of the material, and its initiql opacity.
         Color color = material.color;

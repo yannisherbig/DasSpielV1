@@ -93,9 +93,17 @@ public class ServerScript : MonoBehaviour {
             InvokeRepeating("SpawnGoldenPickUp", 29, 29);
         }
 
-        // Die Auskommentierung der unteren beiden Zeilen rückgängig machen, um einen Dummy-Player-Objekt für Testzwecke zu haben
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.999", "Dummy Dummyman", 99999));
+        //// Die Auskommentierung der unteren beiden Zeilen rückgängig machen, um einen Dummy-Player-Objekt für Testzwecke zu haben
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.999", "DUMMYDUMMYMANNNN", 99999));
         //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.999"));
+
+        //// Ein zweites Dummy-Player-Objekt:
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.111", "DUMMYDUMMYMANNN2", 222222));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.111"));
+
+        //// Ein drittes Dummy-Player-Objekt:
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.222", "DUMMYDUMMYMANNN3", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.222"));
 
         ThreadStart ts = new ThreadStart(StartListening);
         tcpListenerThread = new Thread(ts);
@@ -114,7 +122,9 @@ public class ServerScript : MonoBehaviour {
                 {
                     p1stScore = cp;
                     if (cp == p2ndScore)
-                        p2ndScore = null;                   
+                        p2ndScore = null;
+                    if (cp == p3rdScore)
+                        p3rdScore = null;
                 }
                 else if (players.Count > 1 && (p2ndScore == null || cp.PlayerObject.GetComponent<PlayerScript>().score > p2ndScore.PlayerObject.GetComponent<PlayerScript>().score) && (cp != p1stScore))
                 {
@@ -124,21 +134,21 @@ public class ServerScript : MonoBehaviour {
                 }
                 else if (players.Count > 2 && (p3rdScore == null || cp.PlayerObject.GetComponent<PlayerScript>().score > p3rdScore.PlayerObject.GetComponent<PlayerScript>().score) && (cp != p1stScore) && (cp != p2ndScore))
                 {
-                    if (cp != p1stScore && cp != p3rdScore)
+                    if (cp != p1stScore && cp != p2ndScore)
                         p3rdScore = cp;
                 }
             }
 
-            if (p2ndScore == null && p3rdScore == null)
+            if (players.Count == 1)
             {
                 top3Text.text = "<b>Top 3</b>\n<size=50>1st: " + p1stScore.Username + " (" + p1stScore.PlayerObject.GetComponent<PlayerScript>().score + "p)</size>";
             }
-            else if (p3rdScore == null)
+            else if (players.Count == 2)
             {
                 top3Text.text = "<b>Top 3</b>\n<size=50>1st: " + p1stScore.Username + " (" + p1stScore.PlayerObject.GetComponent<PlayerScript>().score + "p)</size>"
                     + "\n<size=50>2nd: " + p2ndScore.Username + " (" + p2ndScore.PlayerObject.GetComponent<PlayerScript>().score + "p)</size>";
             }
-            else if (p1stScore != null && p2ndScore != null && p3rdScore != null)
+            else
             {
                 top3Text.text = "<b>Top 3</b>\n<size=50>1st: " + p1stScore.Username + " (" + p1stScore.PlayerObject.GetComponent<PlayerScript>().score + "p)</size>"
                 + "\n<size=50>2nd: " + p2ndScore.Username + " (" + p2ndScore.PlayerObject.GetComponent<PlayerScript>().score + "p)</size>"
@@ -473,10 +483,10 @@ public class ServerScript : MonoBehaviour {
         if (!players.ContainsKey(ip))
         {
             string msg = "";
-            if(username.Length > 18)
+            if(username.Length > 16)
             {
                 //msg = "{\"error\": {\"message\": \"Nutzername hat zu viele Zeichen\"}}";
-                msg = "Dein Nutzername hat zu viele Zeichen";
+                msg = "Dein Nutzername darf nicht mehr als 16 Zeichen haben";
                 SendMessage(client, msg);
                 yield break;
             }
@@ -626,6 +636,10 @@ public class ServerScript : MonoBehaviour {
                     players[ip].PlayerObject.GetComponent<Transform>().position = spawnPosition;
                 }              
                 players[ip].PlayerObject.SetActive(true);
+                foreach (var mr in players[ip].PlayerObject.GetComponentsInChildren<MeshRenderer>())
+                {
+                    StartCoroutine(players[ip].PlayerObject.GetComponent<Health>().FadeTo(mr.material, 1f, 2f)); // Start a coroutine to fade the material to 1.0 alpha over 2 seconds and disable the GameObject
+                }
                 string username = players[ip].Username;
                 Debug.Log(username + " spawned on the field; Player-Model: " + playerObjectModels[players[ip].PlayModelNum].name.Substring(9));
             }
@@ -720,7 +734,7 @@ public class ServerScript : MonoBehaviour {
             }
             if(colliders.Length == 0)
             {
-                msg = "Es befinden sich keine Spieler-Objekte im spezifiziertem Umkreis";
+                msg += "]";
             }
             SendMessage(connectedClient, msg);
         }
@@ -753,7 +767,7 @@ public class ServerScript : MonoBehaviour {
             }
             if (colliders.Length == 0)
             {
-                msg = "Es befinden sich keine Pick-Ups im spezifiziertem Umkreis";
+                msg += "]";
             }
             SendMessage(connectedClient, msg);
         }
@@ -852,22 +866,44 @@ public class ServerScript : MonoBehaviour {
     {
         if (players.ContainsKey(ip))
         {
-            players[ip].PlayerObject.SetActive(false);
+            HandleRemoveOfPlayer(ip);
             string username = players[ip].Username;
             Debug.Log(username + " has been removed from the field");
         }
         yield return null;
     }
 
-    public IEnumerator ExecuteOnMainThread_DisconnectPlayer(string ip)
+    public void HandleRemoveOfPlayer(string ip)
     {
         if (players.ContainsKey(ip))
         {
+            Player po = players[ip];
+            if (po == p1stScore)
+            {
+                p1stScore = null;
+            }
+            else if (po == p2ndScore)
+            {
+                p2ndScore = null;
+            }
+            else if (po == p3rdScore)
+            {
+                p3rdScore = null;
+            }
+            players[ip].PlayerObject.SetActive(false);
+            players[ip].PlayerObject.GetComponent<Health>().UpdateScore();
+            players[ip].PlayerObject.GetComponent<Health>().currentHealth = 0;
+        }
+    }
+
+    public IEnumerator ExecuteOnMainThread_DisconnectPlayer(string ip)
+    {
+            HandleRemoveOfPlayer(ip);
             string username = players[ip].Username;
             Destroy(players[ip].PlayerObject);
             players.Remove(ip);
             Debug.Log(username + " disconnected and has been removed from the field and dictionary");
-        }
+        
         yield return null;
     }
 
