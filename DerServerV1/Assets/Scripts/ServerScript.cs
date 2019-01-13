@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.IO;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Player
 {
@@ -94,16 +95,136 @@ public class ServerScript : MonoBehaviour {
         }
 
         //// Die Auskommentierung der unteren beiden Zeilen rückgängig machen, um einen Dummy-Player-Objekt für Testzwecke zu haben
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.999", "DUMMYDUMMYMANNNN", 99999));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.999"));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.1", "Player1", 99999));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.1"));
 
         //// Ein zweites Dummy-Player-Objekt:
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.111", "DUMMYDUMMYMANNN2", 222222));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.111"));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.2", "Player2", 222222));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.2"));
 
         //// Ein drittes Dummy-Player-Objekt:
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.222", "DUMMYDUMMYMANNN3", 333333));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.222"));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.3", "Player3", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.3"));
+
+        //// 4. 
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.4", "Player4", 222222));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.4"));
+
+        //// 5.
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.5", "Player5", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.5"));
+
+        //// ...
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.6", "Player6", 222222));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.6"));
+
+        //// ..
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.7", "Player7", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.7"));
+
+        //// .
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.8", "Player8", 222222));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.8"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.9", "Player9", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.9"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.10", "Player10", 222222));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.10"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.11", "Player11", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.11"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.12", "Player12", 222222));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.12"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.13", "Player13", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.13"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.14", "Player14", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.14"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.15", "Player15", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.15"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.16", "Player16", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.16"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.17", "Player17", 222222));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.17"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.18", "Player18", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.18"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.19", "Player19", 222222));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.19"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.20", "Player20", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.20"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.21", "Player21", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.21"));
+        
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.22", "Player22", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.22"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.23", "Player23", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.23"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.24", "Player24", 222222));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.24"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.25", "Player25", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.25"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.26", "Player26", 222222));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.26"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.27", "Player27", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("99.999.999.27"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.28", "Player28", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.28"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.29", "Player29", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.29"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.30", "Player30", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("99.999.999.30"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.31", "Player31", 222222));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.31"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.32", "Player32", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.32"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.33", "Player33", 222222));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.33"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.34", "Player34", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.34"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.35", "Player35", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.35"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.36", "Player36", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.36"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.37", "Player37", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.37"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.38", "Player38", 222222));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.38"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.39", "Player39", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("99.999.999.39"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.40", "Player40", 222222));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.40"));
+
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.41", "Player41", 333333));  // Maximale Spieleranzahl
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.41"));  
+        
 
         ThreadStart ts = new ThreadStart(StartListening);
         tcpListenerThread = new Thread(ts);
@@ -486,10 +607,28 @@ public class ServerScript : MonoBehaviour {
             if(username.Length > 16)
             {
                 //msg = "{\"error\": {\"message\": \"Nutzername hat zu viele Zeichen\"}}";
-                msg = "Dein Nutzername darf nicht mehr als 16 Zeichen haben";
+                msg = "Der Nutzername muss aus weniger als 16 Zeichen bestehen!";
                 SendMessage(client, msg);
                 yield break;
             }
+            if (username.Equals(""))
+            {              
+                //msg = "{\"error\": {\"message\": \"Nutzername hat zu viele Zeichen\"}}";
+                msg = "Du hast keinen Nutzernamen angegeben!";
+                SendMessage(client, msg);
+                yield break;             
+            }
+            foreach (var player in players)
+            {
+                if (player.Value.Username.Equals(username))
+                {
+                    //msg = "{\"error\": {\"message\": \"Nutzername hat zu viele Zeichen\"}}";
+                    msg = "Nutzername ist schon belegt";
+                    SendMessage(client, msg);
+                    yield break;
+                }
+            }
+           
             Debug.Log(username + " connected from " + ip + ":" + clientPort);
             bool freeSpawnPosFound = false;
             /*
@@ -511,7 +650,9 @@ public class ServerScript : MonoBehaviour {
                 loopCounter++;
                 if (loopCounter > 20)
                 {
-                    Debug.Log("Kein Platz mehr auf Spielfeld");
+                    //Debug.Log("Kein Platz mehr auf Spielfeld");
+                    msg = "Aktuell kein Platz mehr auf Spielfeld";
+                    SendMessage(client, msg);
                     yield break;  // return
                 }
                 // Sich im Umgebungsradius befindlichen Collider in Array schreiben
@@ -520,8 +661,8 @@ public class ServerScript : MonoBehaviour {
                 // Wenn Array nicht leer ist, dann ist mind. ein Collider im Weg
                 if (collidersInSpawnPos.Length != 0)
                 {
-                    int spawnPointX = UnityEngine.Random.Range(-20, 20);
-                    int spawnPointZ = UnityEngine.Random.Range(-7, 7);
+                    int spawnPointX = UnityEngine.Random.Range(-49, 49);
+                    int spawnPointZ = UnityEngine.Random.Range(-28, 27);
                     spawnPosition = new Vector3(spawnPointX, 1.03f, spawnPointZ);
 
                     continue;  // Schleifendurchlauf neu starten
@@ -621,8 +762,8 @@ public class ServerScript : MonoBehaviour {
                         // Wenn Array nicht leer ist, dann ist mind. ein Collider im Weg
                         if (collidersInSpawnPos.Length != 0)
                         {
-                            int spawnPointX = UnityEngine.Random.Range(-20, 20);
-                            int spawnPointZ = UnityEngine.Random.Range(-7, 7);
+                            int spawnPointX = UnityEngine.Random.Range(-49, 49);
+                            int spawnPointZ = UnityEngine.Random.Range(-28, 27);
                             spawnPosition = new Vector3(spawnPointX, 1.03f, spawnPointZ);
 
                             continue;  // Schleifendurchlauf neu starten
@@ -977,12 +1118,12 @@ public class ServerScript : MonoBehaviour {
     
     public void StopServer()
     {
-        Debug.Log("in StopServer");
+        //Debug.Log("in StopServer");
         OnApplicationQuit();
         
-        Debug.Log("in StopServer after OnApplicationQuit");
+        //Debug.Log("in StopServer after OnApplicationQuit");
         StartCoroutine(Start());
-        Debug.Log("after Start() in StopServer");
+        //Debug.Log("after Start() in StopServer");
     }
 
     public void StopListening()
@@ -992,9 +1133,19 @@ public class ServerScript : MonoBehaviour {
 
     public void QuitGame()
     {
-        Debug.Log("in QuitGame");
+        //Debug.Log("in QuitGame");
         Application.Quit();
-        Debug.Log("in QuitGame after Application.Quit");
+        //Debug.Log("in QuitGame after Application.Quit");
+    }
+
+    public void SwitchScene()
+    {
+        var currentScene = SceneManager.GetActiveScene();
+        var currentSceneName = currentScene.name;
+        if(currentSceneName.Equals("MainScene"))
+            SceneManager.LoadScene("Labyrinth");
+        else
+            SceneManager.LoadScene("MainScene");
     }
 
     void OnApplicationQuit()
@@ -1002,7 +1153,7 @@ public class ServerScript : MonoBehaviour {
         StopListening();
         //RemovePickUps();
         RemoveAllPlayers();
- 
+        playerModelNumber = 0;
         try
         {
             tcpListenerThread.Join(500);
