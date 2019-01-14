@@ -164,7 +164,7 @@ public class ServerScript : MonoBehaviour {
 
         //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.21", "Player21", 333333));
         //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.21"));
-        
+
         //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.22", "Player22", 333333));
         //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.22"));
 
@@ -224,7 +224,7 @@ public class ServerScript : MonoBehaviour {
 
         //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.41", "Player41", 333333));  // Maximale Spieleranzahl
         //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.41"));  
-        
+
 
         ThreadStart ts = new ThreadStart(StartListening);
         tcpListenerThread = new Thread(ts);
