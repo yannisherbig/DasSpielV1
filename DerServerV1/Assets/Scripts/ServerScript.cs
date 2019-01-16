@@ -573,7 +573,7 @@ public class ServerScript : MonoBehaviour {
 
     public IEnumerator ExecuteOnMainThread_StartMowing(string ip)
     {
-        if (players.ContainsKey(ip))
+        if (players.ContainsKey(ip) && players[ip].PlayerObject.activeInHierarchy)
         {
             //players[ip].PlayerObject.GetComponent<PlayerScript>().mowing = true;
             players[ip].PlayerObject.GetComponent<PlayerScript>().StartTheMow();
@@ -794,7 +794,7 @@ public class ServerScript : MonoBehaviour {
 
     public IEnumerator ExecuteOnMainThread_ShootBullet(string ip)
     {
-        if (players.ContainsKey(ip))
+        if (players.ContainsKey(ip) && players[ip].PlayerObject.activeInHierarchy)
         {
             players[ip].PlayerObject.GetComponent<PlayerScript>().Fire();
         }
@@ -923,7 +923,7 @@ public class ServerScript : MonoBehaviour {
 
     public IEnumerator ExecuteOnMainThread_DrawLine(string ip, string color)
     {
-        if (players.ContainsKey(ip))
+        if (players.ContainsKey(ip) && players[ip].PlayerObject.activeInHierarchy)
         {
             TrailRenderer tr = players[ip].PlayerObject.GetComponent<PlayerScript>().trailRendererPos.GetComponent<TrailRenderer>();
             tr.Clear();
@@ -965,7 +965,7 @@ public class ServerScript : MonoBehaviour {
     }
     public IEnumerator ExecuteOnMainThread_Move(string ip, int speed)
     {
-        if (players.ContainsKey(ip))
+        if (players.ContainsKey(ip) && players[ip].PlayerObject.activeInHierarchy)
         {
             //Rigidbody.MovePosition(Vector3) to set your new position
             Vector3 forwardVel = players[ip].PlayerObject.GetComponent<Transform>().forward * speed;
