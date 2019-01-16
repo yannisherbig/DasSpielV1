@@ -616,7 +616,7 @@ public class ServerScript2 : MonoBehaviour {
 
     public IEnumerator ExecuteOnMainThread_Angle (TcpClient connectedClient, string ip)
     {
-        float angle = players[ip].PlayerObject.GetComponent<ClosestWall>().Angle();
+        float angle = players[ip].PlayerObject.GetComponent<PlayerScript2>().Angle();
         string msg = angle.ToString();
         SendMessage(connectedClient, msg);
         yield return null;
@@ -625,7 +625,7 @@ public class ServerScript2 : MonoBehaviour {
     public IEnumerator ExecuteOnMainThread_DistanzWand(TcpClient connectedClient, string ip)
     {
 
-       float distance = players[ip].PlayerObject.GetComponent<ClosestWall>().Distance();
+       float distance = players[ip].PlayerObject.GetComponent<PlayerScript2>().Distance();
         string msg = distance.ToString();
         SendMessage(connectedClient, msg);
         yield return null;

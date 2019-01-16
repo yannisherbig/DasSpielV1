@@ -34,6 +34,7 @@ public class PlayerScript2 : MonoBehaviour {
     void Start () {
         GetComponent<Rigidbody>().inertiaTensorRotation = Quaternion.identity;
         terrain = Terrain.activeTerrain;
+        player = gameObject;
         //GetComponent<TrailRenderer>().transform.position = new Vector3(transform.position.x - 2, transform.position.y - 0.3f, transform.position.z - 2);
     }
 
