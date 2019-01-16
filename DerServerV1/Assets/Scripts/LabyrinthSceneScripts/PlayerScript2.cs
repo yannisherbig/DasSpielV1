@@ -35,6 +35,7 @@ public class PlayerScript2 : MonoBehaviour {
         GetComponent<Rigidbody>().inertiaTensorRotation = Quaternion.identity;
         terrain = Terrain.activeTerrain;
         player = gameObject;
+        bulletSpeed = 10;
         //GetComponent<TrailRenderer>().transform.position = new Vector3(transform.position.x - 2, transform.position.y - 0.3f, transform.position.z - 2);
     }
 
@@ -193,16 +194,20 @@ public class PlayerScript2 : MonoBehaviour {
     }
 
     public void Fire()
-    {    
+    {
         // Create the Bullet from the Bullet Prefab
+        //var bullet = (GameObject)Instantiate(
+        //    bulletPrefab,
+        //    bulletSpawn.position,
+        //    bulletSpawn.rotation);
         var bullet = (GameObject)Instantiate(
             bulletPrefab,
-            bulletSpawn.position,
+            new Vector3(bulletSpawn.position.x, bulletSpawn.position.y + 1, bulletSpawn.position.z),
             bulletSpawn.rotation);
 
         // Add velocity to the bullet
         bullet.GetComponent<Rigidbody>().velocity = (transform.forward + transform.right) * bulletSpeed;
-        bullet.GetComponent<Bullet>().shotCameFromPlayerIP = playerIP;
+        bullet.GetComponent<Bullet2>().shotCameFromPlayerIP = playerIP;
         // Destroy the bullet after 2 seconds
         Destroy(bullet, 4.0f);
     }

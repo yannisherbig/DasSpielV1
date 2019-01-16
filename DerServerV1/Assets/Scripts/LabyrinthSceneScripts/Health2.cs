@@ -30,14 +30,31 @@ public class Health2 : MonoBehaviour
                 StartCoroutine(FadeTo(mr.material, 0f, 2f)); // Start a coroutine to fade the material to zero alpha over 2 seconds and disable the GameObject
             }
             StartCoroutine(SetInactive(gameObject, 2.01f));
-            serverScript.GetComponent<ServerScript>().players[hitCameFromPlayerIP].PlayerObject.GetComponent<PlayerScript>().score++;
+            serverScript.GetComponent<ServerScript2>().players[hitCameFromPlayerIP].PlayerObject.GetComponent<PlayerScript2>().score++;
         }
         healthBar.sizeDelta = new Vector2(currentHealth, healthBar.sizeDelta.y);
         Debug.Log("healthBar.sizeDelta: " + healthBar.sizeDelta + " ; healthBar.sizeDelta.x: " + healthBar.sizeDelta.x + " ; healthBar.sizeDelta.y: " + healthBar.sizeDelta.y);
         //healthBar.sizeDelta = new Vector2(((float)currentHealth / maxHeath) * maxHealthBarSize, healthBar.sizeDelta.y);
     }
 
-    
+    public void TakeDamage(int amount)
+    {
+        currentHealth -= amount;
+        if (currentHealth <= 0)
+        {
+            Destroy(Instantiate(deathEffect.gameObject, gameObject.transform.position, Quaternion.identity) as GameObject, deathEffect.main.startLifetime.constant);
+            currentHealth = 0;
+            foreach (var mr in gameObject.GetComponentsInChildren<MeshRenderer>())
+            {
+                StartCoroutine(FadeTo(mr.material, 0f, 2f)); // Start a coroutine to fade the material to zero alpha over 2 seconds and disable the GameObject
+            }
+            StartCoroutine(SetInactive(gameObject, 2.01f));
+        }
+        healthBar.sizeDelta = new Vector2(currentHealth, healthBar.sizeDelta.y);
+        Debug.Log("healthBar.sizeDelta: " + healthBar.sizeDelta + " ; healthBar.sizeDelta.x: " + healthBar.sizeDelta.x + " ; healthBar.sizeDelta.y: " + healthBar.sizeDelta.y);
+        //healthBar.sizeDelta = new Vector2(((float)currentHealth / maxHeath) * maxHealthBarSize, healthBar.sizeDelta.y);
+    }
+
     IEnumerator SetInactive(GameObject go, float seconds)
     {
         yield return new WaitForSeconds(seconds);

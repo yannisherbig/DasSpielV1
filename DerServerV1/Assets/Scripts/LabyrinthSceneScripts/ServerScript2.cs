@@ -308,16 +308,9 @@ public class ServerScript2 : MonoBehaviour {
                 UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_Tipp(connectedClient,ip));
                 break;
             
-        }
-            
-            
-                
+        }               
    
     }
-
-   
-
-   
 
     IEnumerator SetInactive(GameObject go, float seconds)
     {
@@ -379,7 +372,7 @@ public class ServerScript2 : MonoBehaviour {
             endOfLoop:
             GameObject temp = Instantiate(playerObjectModels[playerModelNumber], spawnPosition, Quaternion.identity);
             string playerModelName = playerObjectModels[playerModelNumber].name;
-            string playerModel = playerModelName.Substring(9, playerModelName.Length - 9);
+            string playerModel = playerModelName.Substring(9, playerModelName.Length - 9 - 1);
             Player newPlayer = new Player(temp, username);
             players.Add(ip, newPlayer);
             players[ip].PlayModelNum = playerModelNumber;
@@ -412,10 +405,11 @@ public class ServerScript2 : MonoBehaviour {
                      * und zum anderen, um dem Spieler zu ermöglichen, alle Spieler in einem bestimmten 
                      * Radius abzufragen
                      */
-
+                    Vector3 spawnPosition = new Vector3(-6.3f, 3, 10);
                     //Vector3 spawnPosition = new Vector3(-6.3f, 3, 9.2f);
-                 
-                    //players[ip].PlayerObject.GetComponent<Transform>().position = spawnPosition;
+
+                    players[ip].PlayerObject.GetComponent<Transform>().position = spawnPosition;
+                    players[ip].PlayerObject.GetComponent<Transform>().rotation = Quaternion.identity; 
                 }              
                 players[ip].PlayerObject.SetActive(true);
                 foreach (var mr in players[ip].PlayerObject.GetComponentsInChildren<MeshRenderer>())
@@ -437,7 +431,7 @@ public class ServerScript2 : MonoBehaviour {
     {
         if (players.ContainsKey(ip))
         {
-            players[ip].PlayerObject.GetComponent<PlayerScript>().Fire();
+            players[ip].PlayerObject.GetComponent<PlayerScript2>().Fire();
         }
         yield return null;
     }
@@ -463,7 +457,7 @@ public class ServerScript2 : MonoBehaviour {
     {
         if (players.ContainsKey(ip))
         {
-            float dist = players[ip].PlayerObject.GetComponent<PlayerScript>().distToWallAhead;
+            float dist = players[ip].PlayerObject.GetComponent<PlayerScript2>().distToWallAhead;
        
             SendMessage(connectedClient, dist.ToString());
         }
@@ -474,7 +468,7 @@ public class ServerScript2 : MonoBehaviour {
     {
         if (players.ContainsKey(ip))
         {
-            Vector3 directionVector = players[ip].PlayerObject.GetComponent<PlayerScript>().directionVector;
+            Vector3 directionVector = players[ip].PlayerObject.GetComponent<PlayerScript2>().directionVector;
             string msg = "{\"x\": " + directionVector.x + ", \"y\": " + directionVector.y + ", \"z\": " + directionVector.z + "}";
             SendMessage(connectedClient, msg);
         }
@@ -498,7 +492,7 @@ public class ServerScript2 : MonoBehaviour {
     {
         if (players.ContainsKey(ip))
         {
-            TrailRenderer tr = players[ip].PlayerObject.GetComponent<PlayerScript>().trailRendererPos.GetComponent<TrailRenderer>();
+            TrailRenderer tr = players[ip].PlayerObject.GetComponent<PlayerScript2>().trailRendererPos.GetComponent<TrailRenderer>();
             tr.Clear();
             //Material m = tr.material;
             Material m = trailMaterial; 
@@ -532,7 +526,7 @@ public class ServerScript2 : MonoBehaviour {
     {
         if (players.ContainsKey(ip))
         {
-            players[ip].PlayerObject.GetComponent<PlayerScript>().trailRendererPos.GetComponent<TrailRenderer>().time = 0;
+            players[ip].PlayerObject.GetComponent<PlayerScript2>().trailRendererPos.GetComponent<TrailRenderer>().time = 0;
         }
         yield return null;
     }
@@ -593,7 +587,7 @@ public class ServerScript2 : MonoBehaviour {
         {
             Player po = players[ip];
             players[ip].PlayerObject.SetActive(false);
-            players[ip].PlayerObject.GetComponent<Health>().currentHealth = 0;
+            players[ip].PlayerObject.GetComponent<Health2>().currentHealth = 0;
         }
     }
 

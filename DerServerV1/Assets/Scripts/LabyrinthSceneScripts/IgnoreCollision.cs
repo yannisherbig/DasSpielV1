@@ -25,6 +25,11 @@ public class IgnoreCollision : MonoBehaviour {
         {
             Physics.IgnoreCollision(collision.gameObject.GetComponent<Collider>(), GetComponent<Collider>());
         }
+
+        if (collision.gameObject.tag == "Trap")
+        {
+            GetComponent<Health2>().TakeDamage(25);
+        }
     }
 
 }

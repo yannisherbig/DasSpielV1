@@ -19,7 +19,7 @@ public class Bullet2 : MonoBehaviour {
         {
             detectedBefore = true;
             //Debug.Log("player Coll detected");
-            var health = hit.GetComponent<Health>();
+            var health = hit.GetComponent<Health2>();
             if (health != null)
             {
                 health.TakeDamage(10, shotCameFromPlayerIP);

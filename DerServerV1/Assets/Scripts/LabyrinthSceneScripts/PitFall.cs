@@ -14,8 +14,8 @@ public class PitFall : MonoBehaviour {
 		
 	}
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision other)
     {
-        Destroy(other.gameObject);
+        //other.gameObject.GetComponent<Health2>().TakeDamage(100);
     }
 }
