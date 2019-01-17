@@ -21,6 +21,7 @@ public class Player
     public GameObject PlayerObject { get; set; }
     public string Username { get; set; }
     public int PlayModelNum { get; set; }
+    public int numOfActionsInQueue { get; set; }
 }
  
 
@@ -73,6 +74,8 @@ public class ServerScript : MonoBehaviour {
 
     // Material für TrailRenderer
     public Material trailMaterial;
+
+    public int maxNumOfActionsInQueuePerPlayer = 10;
 
     IEnumerator Start() {
         startButtonClicked = false;
@@ -309,11 +312,16 @@ public class ServerScript : MonoBehaviour {
             {                            
                 //Debug.Log("Before client connected");
                 connectedClient = tcpListener.AcceptTcpClient();
-                //Debug.Log("After client connected");
-                
+                //Debug.Log("After client connected");              
                 //Debug.Log("Aktuelle Spieleranzahl: " + players.Count);
-
                 string ip = ((IPEndPoint)connectedClient.Client.RemoteEndPoint).Address.ToString();
+                if (players.ContainsKey(ip))
+                {
+                    if (players[ip].numOfActionsInQueue > maxNumOfActionsInQueuePerPlayer)
+                        continue;
+                    else
+                        players[ip].numOfActionsInQueue++;
+                }
                 int clientPort = ((IPEndPoint)connectedClient.Client.RemoteEndPoint).Port;
 
                 NetworkStream ns = null;
@@ -582,6 +590,7 @@ public class ServerScript : MonoBehaviour {
         {
             Debug.Log("Player from " + ip + " trying to mow, but has not connected yet");
         }
+        players[ip].numOfActionsInQueue--;
         yield return null;
     }
 
@@ -596,6 +605,7 @@ public class ServerScript : MonoBehaviour {
         {
             Debug.Log("Player from " + ip + " trying to stop mowing, but has not connected yet");
         }
+        players[ip].numOfActionsInQueue--;
         yield return null;
     }
 
@@ -719,6 +729,7 @@ public class ServerScript : MonoBehaviour {
             msg = "Verbindung erfolgreich hergestellt! Player-Model: " + playerModel;
             SendMessage(client, msg);
         }
+        players[ip].numOfActionsInQueue--;
         yield return null;
     }
 
@@ -789,6 +800,7 @@ public class ServerScript : MonoBehaviour {
         {
             Debug.Log("Player from " + ip + " trying to spawn, but has not connected yet");
         }
+        players[ip].numOfActionsInQueue--;
         yield return null;
     }
 
@@ -798,6 +810,7 @@ public class ServerScript : MonoBehaviour {
         {
             players[ip].PlayerObject.GetComponent<PlayerScript>().Fire();
         }
+        players[ip].numOfActionsInQueue--;
         yield return null;
     }
 
@@ -814,6 +827,7 @@ public class ServerScript : MonoBehaviour {
 
             SendMessage(connectedClient, svrMsg);
         }
+        players[ip].numOfActionsInQueue--;
         yield return null;
     }
 
@@ -825,6 +839,7 @@ public class ServerScript : MonoBehaviour {
        
             SendMessage(connectedClient, dist.ToString());
         }
+        players[ip].numOfActionsInQueue--;
         yield return null;
     }
 
@@ -836,6 +851,7 @@ public class ServerScript : MonoBehaviour {
             string msg = "{\"x\": " + directionVector.x + ", \"y\": " + directionVector.y + ", \"z\": " + directionVector.z + "}";
             SendMessage(connectedClient, msg);
         }
+        players[ip].numOfActionsInQueue--;
         yield return null;
     }
 
@@ -879,6 +895,7 @@ public class ServerScript : MonoBehaviour {
             }
             SendMessage(connectedClient, msg);
         }
+        players[ip].numOfActionsInQueue--;
         yield return null;
     }
 
@@ -912,6 +929,7 @@ public class ServerScript : MonoBehaviour {
             }
             SendMessage(connectedClient, msg);
         }
+        players[ip].numOfActionsInQueue--;
         yield return null;
     }
 
@@ -952,6 +970,7 @@ public class ServerScript : MonoBehaviour {
             tr.endWidth = 0.2f;
             tr.time = 30;
         }
+        players[ip].numOfActionsInQueue--;
         yield return null;
     }
 
@@ -961,6 +980,7 @@ public class ServerScript : MonoBehaviour {
         {
             players[ip].PlayerObject.GetComponent<PlayerScript>().trailRendererPos.GetComponent<TrailRenderer>().time = 0;
         }
+        players[ip].numOfActionsInQueue--;
         yield return null;
     }
     public IEnumerator ExecuteOnMainThread_Move(string ip, int speed)
@@ -980,6 +1000,7 @@ public class ServerScript : MonoBehaviour {
             players[ip].PlayerObject.GetComponent<Rigidbody>().velocity = horizontalVel + forwardVel;
 
         }
+        players[ip].numOfActionsInQueue--;
         yield return null;
     }
 
@@ -1000,6 +1021,7 @@ public class ServerScript : MonoBehaviour {
             string username = players[ip].Username;
             //Debug.Log(username + " performed a rotation on the y-axis which is now at " + players[ip].PlayerObject.transform.rotation.y);
         }
+        players[ip].numOfActionsInQueue--;
         yield return null;
     }
 
@@ -1011,6 +1033,7 @@ public class ServerScript : MonoBehaviour {
             string username = players[ip].Username;
             Debug.Log(username + " has been removed from the field");
         }
+        players[ip].numOfActionsInQueue--;
         yield return null;
     }
 
@@ -1039,12 +1062,12 @@ public class ServerScript : MonoBehaviour {
 
     public IEnumerator ExecuteOnMainThread_DisconnectPlayer(string ip)
     {
-            HandleRemoveOfPlayer(ip);
-            string username = players[ip].Username;
-            Destroy(players[ip].PlayerObject);
-            players.Remove(ip);
-            Debug.Log(username + " disconnected and has been removed from the field and dictionary");
-        
+        HandleRemoveOfPlayer(ip);
+        string username = players[ip].Username;
+        Destroy(players[ip].PlayerObject);
+        players.Remove(ip);
+        Debug.Log(username + " disconnected and has been removed from the field and dictionary");
+        players[ip].numOfActionsInQueue--;
         yield return null;
     }
 

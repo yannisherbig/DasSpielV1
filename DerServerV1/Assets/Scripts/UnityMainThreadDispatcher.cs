@@ -33,6 +33,7 @@ public class UnityMainThreadDispatcher : MonoBehaviour
             while (_executionQueue.Count > 0)
             {
                 _executionQueue.Dequeue().Invoke();
+                //Debug.Log("_executionQueue.Count: " + _executionQueue.Count);
             }
         }
     }
