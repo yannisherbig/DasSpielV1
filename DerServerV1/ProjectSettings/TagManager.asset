@@ -11,6 +11,8 @@ TagManager:
   - Test
   - PickUpGolden
   - PickUpPoisonous
+  - NoHitBoxPlayer
+  - Trap
   layers:
   - Default
   - TransparentFX

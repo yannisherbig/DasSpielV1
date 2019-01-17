@@ -34,7 +34,7 @@ public class Timer : MonoBehaviour {
         if (theScript.startButtonClicked)
         {
             float timeSinceStartButtonClicked = Time.timeSinceLevelLoad - startButtonClickTime;
-            minutes = (int)(timeSinceStartButtonClicked / 60f);
+            minutes = (int)(timeSinceStartButtonClicked / 60f % 60);
             seconds = (int)(timeSinceStartButtonClicked % 60f);
             hours = (int)((timeSinceStartButtonClicked / 3600) % 24f);
             timerText.text = hours.ToString("00") + ":" + minutes.ToString("00") + ":" + seconds.ToString("00");
