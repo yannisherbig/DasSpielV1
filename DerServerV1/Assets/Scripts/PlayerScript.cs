@@ -70,8 +70,8 @@ public class PlayerScript : MonoBehaviour {
         Debug.Log("trM: " + tr.material);
         tr.material = grassMaterial;
         Debug.Log("trM: " + tr.material);
-        tr.startWidth = 0.7f;
-        tr.endWidth = 0.7f;
+        tr.startWidth = 0.9f;
+        tr.endWidth = 0.9f;
         tr.time = 30;
     }
 
