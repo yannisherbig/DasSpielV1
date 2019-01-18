@@ -27,6 +27,7 @@ public class Player
 
 public class ServerScript : MonoBehaviour {
 
+    long startTime, endTime, timeDiff;
     // TcpListener zum abhören der Verbindungen
     TcpListener tcpListener;
 
@@ -92,9 +93,9 @@ public class ServerScript : MonoBehaviour {
         isRunning = true;
         if (pickUpToggle.isOn)
         {
-            InvokeRepeating("SpawnStandardPickUp", 0, 5);
-            InvokeRepeating("SpawnPoisonousPickUp", 6, 12);
-            InvokeRepeating("SpawnGoldenPickUp", 29, 29);
+            InvokeRepeating("SpawnStandardPickUp", 0, 20);
+            InvokeRepeating("SpawnPoisonousPickUp", 6, 20);
+            InvokeRepeating("SpawnGoldenPickUp", 29, 39);
         }
 
         //// Die Auskommentierung der unteren beiden Zeilen rückgängig machen, um einen Dummy-Player-Objekt für Testzwecke zu haben
@@ -162,71 +163,10 @@ public class ServerScript : MonoBehaviour {
         //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.19", "Player19", 222222));
         //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.19"));
 
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.20", "Player20", 333333));
+        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.20", "Player20", 333333)); // Maximale Spieleranzahl
         //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.20"));
 
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.21", "Player21", 333333));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.21"));
 
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.22", "Player22", 333333));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.22"));
-
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.23", "Player23", 333333));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.23"));
-
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.24", "Player24", 222222));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.24"));
-
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.25", "Player25", 333333));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.25"));
-
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.26", "Player26", 222222));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.26"));
-
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.27", "Player27", 333333));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("99.999.999.27"));
-
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.28", "Player28", 333333));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.28"));
-
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.29", "Player29", 333333));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.29"));
-
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.30", "Player30", 333333));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("99.999.999.30"));
-
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.31", "Player31", 222222));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.31"));
-
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.32", "Player32", 333333));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.32"));
-
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.33", "Player33", 222222));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.33"));
-
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.34", "Player34", 333333));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.34"));
-
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.35", "Player35", 333333));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.35"));
-
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.36", "Player36", 333333));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.36"));
-
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.37", "Player37", 333333));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.37"));
-
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.38", "Player38", 222222));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.38"));
-
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.39", "Player39", 333333));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("99.999.999.39"));
-
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.40", "Player40", 222222));
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.40"));
-
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_AddNewPlayer(new TcpClient(), "999.999.999.41", "Player41", 333333));  // Maximale Spieleranzahl
-        //UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_SpawnPlayer("999.999.999.41"));  
 
 
         ThreadStart ts = new ThreadStart(StartListening);
@@ -301,7 +241,7 @@ public class ServerScript : MonoBehaviour {
         try
         {
             tcpListener = new TcpListener(IPAddress.Any, 5555);
-            
+             
             tcpListener.Start();
             //Debug.Log("Server started");
             TcpClient connectedClient = null;
@@ -312,6 +252,7 @@ public class ServerScript : MonoBehaviour {
             {                            
                 //Debug.Log("Before client connected");
                 connectedClient = tcpListener.AcceptTcpClient();
+                //startTime = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
                 //Debug.Log("After client connected");              
                 //Debug.Log("Aktuelle Spieleranzahl: " + players.Count);
                 string ip = ((IPEndPoint)connectedClient.Client.RemoteEndPoint).Address.ToString();
@@ -333,7 +274,6 @@ public class ServerScript : MonoBehaviour {
                     {
                         byte[] receivedBuffer = new byte[1024];
                         int numberOfBytesRead = 0;
-
        
                         int remaining = receivedBuffer.Length;
                       
@@ -449,7 +389,6 @@ public class ServerScript : MonoBehaviour {
             case "ROTATE":
                 float angle;
                 angle = float.Parse(splitData[1]);
-                Debug.Log(angle);
                 UnityMainThreadDispatcher.Instance().Enqueue(ExecuteOnMainThread_Rotate(ip, angle));            
                 break;
 
@@ -523,21 +462,21 @@ public class ServerScript : MonoBehaviour {
             pickUpCopy.transform.position = spawnPosition;
             pickUpCopy.SetActive(true);
             pickUpCopy.GetComponent<PickUpScript>().isActive = true;
-            StartCoroutine(SetInactive(pickUpCopy, 9.9f));
+            StartCoroutine(SetInactive(pickUpCopy, 19.8f));
         }
         else if (pickUpCopy.activeInHierarchy)
         {
             pickUp.transform.position = spawnPosition;
             pickUp.SetActive(true);
             pickUp.GetComponent<PickUpScript>().isActive = true;
-            StartCoroutine(SetInactive(pickUp, 9.9f));
+            StartCoroutine(SetInactive(pickUp, 19.8f));
         }
         else
         {
             pickUp.transform.position = spawnPosition;
             pickUp.SetActive(true);
             pickUp.GetComponent<PickUpScript>().isActive = true;
-            StartCoroutine(SetInactive(pickUp, 9.9f));
+            StartCoroutine(SetInactive(pickUp, 19.8f));
         }
         //GameObject newPickUp = Instantiate(pickUp, spawnPosition, pickUp.transform.rotation);
 
@@ -554,7 +493,7 @@ public class ServerScript : MonoBehaviour {
         pickUpPoisonous.SetActive(true);
         pickUpPoisonous.GetComponent<PickUpScript>().isActive = true;
         //GameObject newPickUp = Instantiate(pickUpPoisonous, spawnPosition, pickUp.transform.rotation);
-        StartCoroutine(SetInactive(pickUpPoisonous, 9.9f));
+        StartCoroutine(SetInactive(pickUpPoisonous, 19.8f));
         //Destroy(newPickUp, 10);
         //pickUps.Add(newPickUp);   
     }
@@ -568,7 +507,7 @@ public class ServerScript : MonoBehaviour {
         pickUpGolden.SetActive(true);
         pickUpGolden.GetComponent<PickUpScript>().isActive = true;
         //GameObject newPickUp = Instantiate(pickUpGolden, spawnPosition, pickUp.transform.rotation);
-        StartCoroutine(SetInactive(pickUpGolden, 10));
+        StartCoroutine(SetInactive(pickUpGolden, 20));
         //Destroy(newPickUp, 10);
         //pickUps.Add(newPickUp);   
     }
@@ -614,7 +553,14 @@ public class ServerScript : MonoBehaviour {
         if (!players.ContainsKey(ip))
         {
             string msg = "";
-            if(username.Length > 16)
+            if (players.Count == playerObjectModels.Length - 20)
+            {
+                //msg = "{\"error\": {\"message\": \"Maximale Spieleranzahl erreicht\"}}";
+                msg = "Maximale Spieleranzahl erreicht";
+                SendMessage(client, msg);
+                yield break;
+            }
+            if (username.Length > 16)
             {
                 //msg = "{\"error\": {\"message\": \"Nutzername hat zu viele Zeichen\"}}";
                 msg = "Der Nutzername muss aus weniger als 16 Zeichen bestehen!";
@@ -682,13 +628,6 @@ public class ServerScript : MonoBehaviour {
                     freeSpawnPosFound = true;
                 }                            
              
-            }
-            if(players.Count == playerObjectModels.Length)
-            {
-                //msg = "{\"error\": {\"message\": \"Maximale Spieleranzahl erreicht\"}}";
-                msg = "Maximale Spieleranzahl erreicht";
-                SendMessage(client, msg);
-                yield break;
             }
             // Dem Spieler ein Spieler-Modell zuweisen
             if (players.Count > 0)
@@ -1006,7 +945,7 @@ public class ServerScript : MonoBehaviour {
 
     public IEnumerator ExecuteOnMainThread_Rotate(string ip, float angle)
     {
-        if (players.ContainsKey(ip))
+        if (players.ContainsKey(ip) && players[ip].PlayerObject.activeInHierarchy)
         {
             //Rigidbody rb = players[ip].PlayerObject.GetComponent<Rigidbody>();
             //Set the axis the Rigidbody rotates in (100 in the y axis)
@@ -1092,6 +1031,9 @@ public class ServerScript : MonoBehaviour {
             {
                 Debug.Log("Stream cannot write");
             }
+            //endTime = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+            //timeDiff = endTime - startTime;
+            //Debug.Log("timeDiff getSrroundings: " + timeDiff);
         }
         catch (SocketException socketException)
         {

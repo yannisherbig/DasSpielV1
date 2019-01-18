@@ -331,7 +331,14 @@ public class ServerScript2 : MonoBehaviour {
         if (!players.ContainsKey(ip))
         {
             string msg = "";
-            if(username.Length > 16)
+            if (players.Count == playerObjectModels.Length - 20)
+            {
+                //msg = "{\"error\": {\"message\": \"Maximale Spieleranzahl erreicht\"}}";
+                msg = "Maximale Spieleranzahl erreicht";
+                SendMessage(client, msg);
+                yield break;
+            }
+            if (username.Length > 16)
             {
                 //msg = "{\"error\": {\"message\": \"Nutzername hat zu viele Zeichen\"}}";
                 msg = "Dein Nutzername darf nicht mehr als 16 Zeichen haben";
@@ -348,13 +355,6 @@ public class ServerScript2 : MonoBehaviour {
 
             Vector3 spawnPosition = new Vector3(-6.3f, 3, 10);
           
-            if(players.Count == playerObjectModels.Length)
-            {
-                //msg = "{\"error\": {\"message\": \"Maximale Spieleranzahl erreicht\"}}";
-                msg = "Maximale Spieleranzahl erreicht";
-                SendMessage(client, msg);
-                yield break;
-            }
             // Dem Spieler ein Spieler-Modell zuweisen
             if (players.Count > 0)
             {
@@ -438,7 +438,7 @@ public class ServerScript2 : MonoBehaviour {
 
     public IEnumerator ExecuteOnMainThread_ShootBullet(string ip)
     {
-        if (players.ContainsKey(ip))
+        if (players.ContainsKey(ip) && players[ip].PlayerObject.activeInHierarchy)
         {
             players[ip].PlayerObject.GetComponent<PlayerScript2>().Fire();
         }
@@ -448,7 +448,7 @@ public class ServerScript2 : MonoBehaviour {
 
     public IEnumerator ExecuteOnMainThread_GetStatus(TcpClient connectedClient, string ip)
     {
-        if (players.ContainsKey(ip))
+        if (players.ContainsKey(ip) && players[ip].PlayerObject.activeInHierarchy)
         {
             Transform t = players[ip].PlayerObject.GetComponent<Transform>();
             string svrMsg = "{\"score\": " + players[ip].PlayerObject.GetComponent<PlayerScript>().score
@@ -466,7 +466,7 @@ public class ServerScript2 : MonoBehaviour {
     //Das Kopieren
     public IEnumerator ExecuteOnMainThread_GetDistToWall(TcpClient connectedClient, string ip)
     {
-        if (players.ContainsKey(ip))
+        if (players.ContainsKey(ip) && players[ip].PlayerObject.activeInHierarchy)
         {
             float dist = players[ip].PlayerObject.GetComponent<PlayerScript2>().distToWallAhead;
        
@@ -478,7 +478,7 @@ public class ServerScript2 : MonoBehaviour {
 
     public IEnumerator ExecuteOnMainThread_GetDirVector(TcpClient connectedClient, string ip)
     {
-        if (players.ContainsKey(ip))
+        if (players.ContainsKey(ip) && players[ip].PlayerObject.activeInHierarchy)
         {
             Vector3 directionVector = players[ip].PlayerObject.GetComponent<PlayerScript2>().directionVector;
             string msg = "{\"x\": " + directionVector.x + ", \"y\": " + directionVector.y + ", \"z\": " + directionVector.z + "}";
@@ -490,7 +490,7 @@ public class ServerScript2 : MonoBehaviour {
 
    public IEnumerator ExecuteOnMainThread_Tipp(TcpClient connectedClient, string ip)
     {
-        if (players.ContainsKey(ip))
+        if (players.ContainsKey(ip) && players[ip].PlayerObject.activeInHierarchy)
         {
             string msg = players[ip].PlayerObject.GetComponent<PlayerScript2>().status;
             SendMessage(connectedClient, msg);
@@ -504,7 +504,7 @@ public class ServerScript2 : MonoBehaviour {
 
     public IEnumerator ExecuteOnMainThread_DrawLine(string ip, string color)
     {
-        if (players.ContainsKey(ip))
+        if (players.ContainsKey(ip) && players[ip].PlayerObject.activeInHierarchy)
         {
             TrailRenderer tr = players[ip].PlayerObject.GetComponent<PlayerScript2>().trailRendererPos.GetComponent<TrailRenderer>();
             tr.Clear();
@@ -539,7 +539,7 @@ public class ServerScript2 : MonoBehaviour {
 
     public IEnumerator ExecuteOnMainThread_StopDrawing(string ip)
     {
-        if (players.ContainsKey(ip))
+        if (players.ContainsKey(ip) && players[ip].PlayerObject.activeInHierarchy)
         {
             players[ip].PlayerObject.GetComponent<PlayerScript2>().trailRendererPos.GetComponent<TrailRenderer>().time = 0;
         }
@@ -548,7 +548,7 @@ public class ServerScript2 : MonoBehaviour {
     }
     public IEnumerator ExecuteOnMainThread_Move(string ip, int speed)
     {
-        if (players.ContainsKey(ip))
+        if (players.ContainsKey(ip) && players[ip].PlayerObject.activeInHierarchy)
         {
             //Rigidbody.MovePosition(Vector3) to set your new position
             Vector3 forwardVel = players[ip].PlayerObject.GetComponent<Transform>().forward * speed;
@@ -569,7 +569,7 @@ public class ServerScript2 : MonoBehaviour {
 
     public IEnumerator ExecuteOnMainThread_Rotate(string ip, float angle)
     {
-        if (players.ContainsKey(ip))
+        if (players.ContainsKey(ip) && players[ip].PlayerObject.activeInHierarchy)
         {
             //Rigidbody rb = players[ip].PlayerObject.GetComponent<Rigidbody>();
             //Set the axis the Rigidbody rotates in (100 in the y axis)
