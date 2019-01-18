@@ -196,7 +196,7 @@ public class PlayerScript : MonoBehaviour {
         else if (other.gameObject.CompareTag("PickUpPoisonous"))
         {
             other.gameObject.SetActive(false);
-            score--;
+            score -= 2;
         }
     }
 
