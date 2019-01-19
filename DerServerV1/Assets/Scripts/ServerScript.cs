@@ -93,9 +93,12 @@ public class ServerScript : MonoBehaviour {
         isRunning = true;
         if (pickUpToggle.isOn)
         {
-            InvokeRepeating("SpawnStandardPickUp", 0, 20);
-            InvokeRepeating("SpawnPoisonousPickUp", 6, 20);
-            InvokeRepeating("SpawnGoldenPickUp", 29, 39);
+            //InvokeRepeating("SpawnStandardPickUp", 0, 20);
+            //InvokeRepeating("SpawnPoisonousPickUp", 6, 20);
+            //InvokeRepeating("SpawnGoldenPickUp", 29, 39);
+            InvokeRepeating("SpawnStandardPickUp", 0, 9);
+            InvokeRepeating("SpawnPoisonousPickUp", 6, 13);
+            InvokeRepeating("SpawnGoldenPickUp", 25, 27);
         }
 
         //// Die Auskommentierung der unteren beiden Zeilen rückgängig machen, um einen Dummy-Player-Objekt für Testzwecke zu haben
@@ -457,30 +460,30 @@ public class ServerScript : MonoBehaviour {
         int spawnPointX = UnityEngine.Random.Range(-49, 49);
         int spawnPointZ = UnityEngine.Random.Range(-28, 27);
         Vector3 spawnPosition = new Vector3(spawnPointX, 4, spawnPointZ);
-        if (pickUp.activeInHierarchy)
-        {
-            pickUpCopy.transform.position = spawnPosition;
-            pickUpCopy.SetActive(true);
-            pickUpCopy.GetComponent<PickUpScript>().isActive = true;
-            StartCoroutine(SetInactive(pickUpCopy, 19.8f));
-        }
-        else if (pickUpCopy.activeInHierarchy)
-        {
-            pickUp.transform.position = spawnPosition;
-            pickUp.SetActive(true);
-            pickUp.GetComponent<PickUpScript>().isActive = true;
-            StartCoroutine(SetInactive(pickUp, 19.8f));
-        }
-        else
-        {
-            pickUp.transform.position = spawnPosition;
-            pickUp.SetActive(true);
-            pickUp.GetComponent<PickUpScript>().isActive = true;
-            StartCoroutine(SetInactive(pickUp, 19.8f));
-        }
-        //GameObject newPickUp = Instantiate(pickUp, spawnPosition, pickUp.transform.rotation);
-
-        //Destroy(newPickUp, 10);
+        //if (pickUp.activeInHierarchy)
+        //{
+        //    pickUpCopy.transform.position = spawnPosition;
+        //    pickUpCopy.SetActive(true);
+        //    pickUpCopy.GetComponent<PickUpScript>().isActive = true;
+        //    StartCoroutine(SetInactive(pickUpCopy, 19.8f));
+        //}
+        //else if (pickUpCopy.activeInHierarchy)
+        //{
+        //    pickUp.transform.position = spawnPosition;
+        //    pickUp.SetActive(true);
+        //    pickUp.GetComponent<PickUpScript>().isActive = true;
+        //    StartCoroutine(SetInactive(pickUp, 19.8f));
+        //}
+        //else
+        //{
+        //    pickUp.transform.position = spawnPosition;
+        //    pickUp.SetActive(true);
+            //pickUp.GetComponent<PickUpScript>().isActive = true;
+        //    StartCoroutine(SetInactive(pickUp, 19.8f));
+        //}
+        GameObject newPickUp = Instantiate(pickUp, spawnPosition, pickUp.transform.rotation);
+        newPickUp.GetComponent<PickUpScript>().isActive = true;
+        Destroy(newPickUp, 17);
         //pickUps.Add(newPickUp);   
     }
 
@@ -489,12 +492,13 @@ public class ServerScript : MonoBehaviour {
         int spawnPointX = UnityEngine.Random.Range(-49, 49);
         int spawnPointZ = UnityEngine.Random.Range(-28, 27);
         Vector3 spawnPosition = new Vector3(spawnPointX, 1, spawnPointZ);
-        pickUpPoisonous.transform.position = spawnPosition;
-        pickUpPoisonous.SetActive(true);
-        pickUpPoisonous.GetComponent<PickUpScript>().isActive = true;
-        //GameObject newPickUp = Instantiate(pickUpPoisonous, spawnPosition, pickUp.transform.rotation);
-        StartCoroutine(SetInactive(pickUpPoisonous, 19.8f));
-        //Destroy(newPickUp, 10);
+        //pickUpPoisonous.transform.position = spawnPosition;
+        //pickUpPoisonous.SetActive(true);
+        //pickUpPoisonous.GetComponent<PickUpScript>().isActive = true;
+        GameObject newPickUp = Instantiate(pickUpPoisonous, spawnPosition, pickUpPoisonous.transform.rotation);
+        //StartCoroutine(SetInactive(pickUpPoisonous, 19.8f));
+        newPickUp.GetComponent<PickUpScript>().isActive = true;
+        Destroy(newPickUp, 16);
         //pickUps.Add(newPickUp);   
     }
 
@@ -503,12 +507,13 @@ public class ServerScript : MonoBehaviour {
         int spawnPointX = UnityEngine.Random.Range(-49, 49);
         int spawnPointZ = UnityEngine.Random.Range(-28, 27);
         Vector3 spawnPosition = new Vector3(spawnPointX, 6, spawnPointZ);
-        pickUpGolden.transform.position = spawnPosition;
-        pickUpGolden.SetActive(true);
-        pickUpGolden.GetComponent<PickUpScript>().isActive = true;
-        //GameObject newPickUp = Instantiate(pickUpGolden, spawnPosition, pickUp.transform.rotation);
-        StartCoroutine(SetInactive(pickUpGolden, 20));
-        //Destroy(newPickUp, 10);
+        //pickUpGolden.transform.position = spawnPosition;
+        //pickUpGolden.SetActive(true);
+        //pickUpGolden.GetComponent<PickUpScript>().isActive = true;
+        GameObject newPickUp = Instantiate(pickUpGolden, spawnPosition, pickUp.transform.rotation);
+        //StartCoroutine(SetInactive(pickUpGolden, 19));
+        newPickUp.GetComponent<PickUpScript>().isActive = true;
+        Destroy(newPickUp, 19);
         //pickUps.Add(newPickUp);   
     }
 
