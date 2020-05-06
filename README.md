@@ -5,3 +5,5 @@ the students simultaneously type in their commands from their workstation-pc, in
 --> who is the best at automating their lawn mower?
 
 the multiplayer experience is enabled by a tcp-server that has been integrated in unity.
+
+![](FlowerMeadow_Poster.png)
