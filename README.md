@@ -6,4 +6,6 @@ the students simultaneously type in their commands from their workstation-pc, in
 
 the multiplayer experience is enabled by a tcp-server that has been integrated in unity.
 
+client libraries: java - https://github.com/yannisherbig/DasSpiel-Client, c - https://github.com/yannisherbig/DasSpielV1-C-Client, python - https://github.com/yannisherbig/DasSpiel-Client-Python
+
 ![](FlowerMeadow_Poster.png)
