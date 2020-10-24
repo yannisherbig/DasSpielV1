@@ -9,3 +9,5 @@ the multiplayer experience is enabled by a tcp-server that has been integrated i
 client libraries: java - https://github.com/yannisherbig/DasSpiel-Client, c - https://github.com/yannisherbig/DasSpielV1-C-Client, python - https://github.com/yannisherbig/DasSpiel-Client-Python
 
 ![](FlowerMeadow_Poster.png)
+
+![](Screenshot.png)
