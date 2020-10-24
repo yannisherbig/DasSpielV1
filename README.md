@@ -10,4 +10,4 @@ client libraries: java - https://github.com/yannisherbig/DasSpiel-Client, c - ht
 
 ![](FlowerMeadow_Poster.png)
 
-[//]: # (![](Screenshot.png))
+<!--- ![](Screenshot.png)) -->
